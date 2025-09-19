@@ -1,0 +1,234 @@
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 09/19/25 11:32:56 Page 1
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+C o m p i l a t i o n
+
+
+      CEE 6410 - Metal Resources Systems Analysis
+      Example 2.1 from Bishop Et Al Text (https://digitalcommons.usu.edu/ecstatic_all/76/)
+      Modifies Example to add a labor constraint
+       
+      THE PROBLEM:
+       
+      How many coups and minivans should a car manufacturer produce in a year?
+      The data are as follows:
+      • The car manufacturer profits by $6,000 per coup produced and $7,000 per
+      minivan produced.
+      • Each coup requires 1,000 pounds of metal to produce while each minivan requires
+      2,000 pounds of metal.
+      • The manufacturer has 4,000,000 pounds of metal available for the year.
+      • Coups have more electronics and features. Thus, each coup requires 4 circuit
+      boards per vehicle while each minivan requires 3 circuit boards per vehicle.
+      • The manufacturer has purchased 12,000 circuit boards for the year.
+      • One coup takes one worker 5 days to produce while one worker takes 2.5 days to
+      produce a minivan.
+      • The manufacturer has 67 workers and runs their factory for 261 days per year
+      (i.e., the manufacturer has 17,500 worker-days per year).
+       
+      maximize profit
+       
+      THE SOLUTION:
+      Uses General Algebraic Modeling System to Solve this Linear Program
+       
+      David E Rosenberg
+      david.rosenberg@usu.edu
+      September 15, 2015
+  32   
+  33  * 1. DEFINE the SETS
+  34  SETS vhec vehicles manufactured /Coup, Minivan/
+  35       res resources /Metal, Circuits, Labor/;
+  36   
+  37  * 2. DEFINE input data
+  38  PARAMETERS
+  39     c(vhec) Objective function coefficients ($ per vehicle)
+  40           /Coup 6000,
+  41           Minivan 7000/
+  42     b(res) Right hand constraint values (per resource)
+  43            /Metal        4000000,
+  44             Circuits     12000,
+  45             Labor        17500/;
+  46   
+  47  TABLE A(vhec,res) Left hand side constraint coefficients
+  48                  Metal    Circuits   Labor
+  49   Coup           1000      4         5
+  50   Minivan        2000      3         2.5;
+  51   
+  52   
+  53  * 3. DEFINE the variables
+  54  VARIABLES X(vhec) Vehicles made (Number)
+  55            VPROFIT  total profit ($);
+  56   
+  57  * Non-negativity constraints
+  58  POSITIVE VARIABLES X;
+  59   
+  60  * 4. COMBINE variables and data in equations
+  61  EQUATIONS
+  62     PROFIT Total profit ($) and objective function value
+  63     RES_CONSTRAIN(res) Resource Constraints;
+  64   
+  65  PROFIT..                 VPROFIT =E= SUM(vhec, c(vhec)*X(vhec));
+  66  RES_CONSTRAIN(res) ..    SUM(vhec, A(vhec,res)*X(vhec)) =L= b(res);
+  67   
+  68   
+  69  * 5. DEFINE the MODEL from the EQUATIONS
+  70  MODEL MANUFACTURING /PROFIT, RES_CONSTRAIN/;
+  71  *Altnerative way to write (include all previously defined equations)
+  72  *MODEL MANUFACTURING /ALL/;
+  73   
+  74   
+  75  * 6. SOLVE the MODEL
+  76  * Solve the MANUFACTURING model using a Linear Programming Solver (see File=>Options=>Solvers)
+  77  *     to maximize VPROFIT
+  78  SOLVE MANUFACTURING USING LP MAXIMIZING VPROFIT;
+  79   
+  80  * 6. CLick File menu => RUN (F9) or Solve icon and examine solution report in .LST file
+
+
+COMPILATION TIME     =        0.000 SECONDS      3 MB  51.1.0 2d039df5 WEX-WEI
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 09/19/25 11:32:56 Page 2
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Equation Listing    SOLVE MANUFACTURING Using LP From line 78
+
+
+---- PROFIT  =E=  Total profit ($) and objective function value
+
+PROFIT..  - 6000*X(Coup) - 7000*X(Minivan) + VPROFIT =E= 0 ; (LHS = 0)
+     
+
+---- RES_CONSTRAIN  =L=  Resource Constraints
+
+RES_CONSTRAIN(Metal)..  1000*X(Coup) + 2000*X(Minivan) =L= 4000000 ; (LHS = 0)
+     
+RES_CONSTRAIN(Circuits)..  4*X(Coup) + 3*X(Minivan) =L= 12000 ; (LHS = 0)
+     
+RES_CONSTRAIN(Labor)..  5*X(Coup) + 2.5*X(Minivan) =L= 17500 ; (LHS = 0)
+     
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 09/19/25 11:32:56 Page 3
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Column Listing      SOLVE MANUFACTURING Using LP From line 78
+
+
+---- X  Vehicles made (Number)
+
+X(Coup)
+                (.LO, .L, .UP, .M = 0, 0, +INF, 0)
+    -6000       PROFIT
+     1000       RES_CONSTRAIN(Metal)
+        4       RES_CONSTRAIN(Circuits)
+        5       RES_CONSTRAIN(Labor)
+
+X(Minivan)
+                (.LO, .L, .UP, .M = 0, 0, +INF, 0)
+    -7000       PROFIT
+     2000       RES_CONSTRAIN(Metal)
+        3       RES_CONSTRAIN(Circuits)
+        2.5     RES_CONSTRAIN(Labor)
+
+
+---- VPROFIT  total profit ($)
+
+VPROFIT
+                (.LO, .L, .UP, .M = -INF, 0, +INF, 0)
+        1       PROFIT
+
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 09/19/25 11:32:56 Page 4
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Range Statistics    SOLVE MANUFACTURING Using LP From line 78
+
+
+RANGE STATISTICS (ABSOLUTE NON-ZERO FINITE VALUES)
+
+RHS       [min, max] : [ 1.200E+04, 4.000E+06] - Zero values observed as well
+Bound     [min, max] : [        NA,        NA] - Zero values observed as well
+Matrix    [min, max] : [ 1.000E+00, 7.000E+03]
+
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 09/19/25 11:32:56 Page 5
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Model Statistics    SOLVE MANUFACTURING Using LP From line 78
+
+
+MODEL STATISTICS
+
+BLOCKS OF EQUATIONS           2     SINGLE EQUATIONS            4
+BLOCKS OF VARIABLES           2     SINGLE VARIABLES            3
+NON ZERO ELEMENTS             9
+
+
+GENERATION TIME      =        0.156 SECONDS      4 MB  51.1.0 2d039df5 WEX-WEI
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 09/19/25 11:32:56 Page 6
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Solution Report     SOLVE MANUFACTURING Using LP From line 78
+
+
+               S O L V E      S U M M A R Y
+
+     MODEL   MANUFACTURING       OBJECTIVE  VPROFIT
+     TYPE    LP                  DIRECTION  MAXIMIZE
+     SOLVER  CPLEX               FROM LINE  78
+
+**** SOLVER STATUS     1 Normal Completion
+**** MODEL STATUS      1 Optimal
+**** OBJECTIVE VALUE         20000000.0000
+
+ RESOURCE USAGE, LIMIT          0.016 10000000000.000
+ ITERATION COUNT, LIMIT         3    2147483647
+*** This solver runs with a community license.
+--- GMO setup time: 0.00s
+--- GMO memory 0.50 Mb (peak 0.50 Mb)
+--- Dictionary memory 0.00 Mb
+--- Cplex 22.1.2.0 link memory 0.00 Mb (peak 0.00 Mb)
+--- Starting Cplex
+
+
+--- LP status (1): optimal.
+--- Cplex Time: 0.00sec (det. 0.01 ticks)
+
+
+Optimal solution found
+Objective:     20000000.000000
+
+
+                           LOWER          LEVEL          UPPER         MARGINAL
+
+---- EQU PROFIT              .              .              .             1.0000      
+
+  PROFIT  Total profit ($) and objective function value
+
+---- EQU RES_CONSTRAIN  Resource Constraints
+
+                LOWER          LEVEL          UPPER         MARGINAL
+
+Metal           -INF      4000000.0000   4000000.0000         2.0000      
+Circuits        -INF        12000.0000     12000.0000      1000.0000      
+Labor           -INF        14000.0000     17500.0000          .          
+
+---- VAR X  Vehicles made (Number)
+
+               LOWER          LEVEL          UPPER         MARGINAL
+
+Coup             .          2400.0000        +INF             .          
+Minivan          .           800.0000        +INF             .          
+
+                           LOWER          LEVEL          UPPER         MARGINAL
+
+---- VAR VPROFIT           -INF      2.0000000E+7        +INF             .          
+
+  VPROFIT  total profit ($)
+
+
+**** REPORT SUMMARY :        0     NONOPT
+                             0 INFEASIBLE
+                             0  UNBOUNDED
+
+
+EXECUTION TIME       =        0.453 SECONDS      4 MB  51.1.0 2d039df5 WEX-WEI
+
+
+USER: Course License                                 G250902+0003Ac-GEN
+      Utah State University                                     DCE4709
+      License for teaching and research at degree granting institutions
+
+
+**** FILE SUMMARY
+
+Input      C:\Users\bhpar\OneDrive\Documents\School\Fall 2025\System Analysis\CEE-6410-Parker\GAMS\EX 2-1 Transportation\EX2-1-transportation.gms
+Output     C:\Users\bhpar\OneDrive\Documents\School\Fall 2025\System Analysis\CEE-6410-Parker\GAMS\EX 2-1 Transportation\EX2-1-transportation.lst

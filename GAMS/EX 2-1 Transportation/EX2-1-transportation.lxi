@@ -1,0 +1,14 @@
+B 3 C o m p i l a t i o n
+B 89 Equation Listing    SOLVE MANUFACTURING Using LP From line 78
+D 92 PROFIT
+D 97 RES_CONSTRAIN
+B 107 Column Listing      SOLVE MANUFACTURING Using LP From line 78
+E 110 X
+E 127 VPROFIT
+B 135 Range Statistics    SOLVE MANUFACTURING Using LP From line 78
+B 146 Model Statistics    SOLVE MANUFACTURING Using LP From line 78
+B 159 Solution Report     SOLVE MANUFACTURING Using LP From line 78
+F 192 PROFIT
+F 196 RES_CONSTRAIN
+G 204 X
+G 213 VPROFIT
