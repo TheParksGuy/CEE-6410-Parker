@@ -1,0 +1,227 @@
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 09/24/25 12:40:50 Page 1
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+C o m p i l a t i o n
+
+
+       
+       
+       
+      THE PROBLEM:
+      A motor vehicle company is planning production for the coming year. The company makes
+      Trucks and Sedans. The company will produce 10,000 vehicles total for the year. Vehicles
+      have the following components:
+      The company has purchased 14,000 fuel tanks. Trucks are made with 2 fuel tanks per
+      vehicle; sedans have just one tank.
+      The company has purchased 18,000 rows of seats. Trucks have 1 row of seats per vehicle;
+      sedans have two rows per vehicles.
+      The company has purchased 6,000 four-wheel drive systems. Trucks are built with 1 four-
+      wheel drive system per vehicle. Sedans have none.
+      Trucks generate $100/vehicle while Sedans generate $110/vehicle.
+       
+       
+       
+  20   
+  21  * 1. DEFINE the SETS
+  22  SETS vhec vehicles manufactured /Truck, Sedans/
+  23       res resources /Tanks, Seats, Transmissions,Vehicles/;
+  24   
+  25  * 2. DEFINE input data
+  26  PARAMETERS
+  27     c(vhec) Objective function coefficients ($ per vehicle)
+  28           /Truck  100,
+  29           Sedans   110/
+  30     b(res) Right hand constraint values (per resource)
+  31            /Tanks            14000,
+  32             Seats            18000,
+  33             Transmissions    6000,
+  34             Vehicles         10000/;
+  35   
+  36  TABLE A(vhec,res) Left hand side constraint coefficients
+  37                  Tanks   Seats   Transmissions   Vehicles
+  38   Truck          2       1       1               1
+  39   Sedans         1       2       0               1;
+  40   
+  41   
+  42  * 3. DEFINE the variables
+  43  VARIABLES X(vhec) Vehicles made (Number)
+  44            VPROFIT  total profit ($);
+  45   
+  46  * Non-negativity constraints
+  47  POSITIVE VARIABLES X;
+  48   
+  49  * 4. COMBINE variables and data in equations
+  50  EQUATIONS
+  51     PROFIT Total profit ($) and objective function value
+  52     RES_CONSTRAIN(res) Resource Constraints;
+  53   
+  54  PROFIT..                 VPROFIT =E= SUM(vhec, c(vhec)*X(vhec));
+  55  RES_CONSTRAIN(res) ..    SUM(vhec, A(vhec,res)*X(vhec)) =L= b(res);
+  56   
+  57   
+  58  * 5. DEFINE the MODEL from the EQUATIONS
+  59  MODEL MANUFACTURING /PROFIT, RES_CONSTRAIN/;
+  60  *Altnerative way to write (include all previously defined equations)
+  61  *MODEL MANUFACTURING /ALL/;
+  62   
+  63   
+  64  * 6. SOLVE the MODEL
+  65  * Solve the MANUFACTURING model using a Linear Programming Solver (see File=>Options=>Solvers)
+  66  *     to maximize VPROFIT
+  67  SOLVE MANUFACTURING USING LP MAXIMIZING VPROFIT;
+  68   
+  69  * 6. CLick File menu => RUN (F9) or Solve icon and examine solution report in .LST file
+
+
+COMPILATION TIME     =        0.000 SECONDS      3 MB  51.1.0 2d039df5 WEX-WEI
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 09/24/25 12:40:50 Page 2
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Equation Listing    SOLVE MANUFACTURING Using LP From line 67
+
+
+---- PROFIT  =E=  Total profit ($) and objective function value
+
+PROFIT..  - 100*X(Truck) - 110*X(Sedans) + VPROFIT =E= 0 ; (LHS = 0)
+     
+
+---- RES_CONSTRAIN  =L=  Resource Constraints
+
+RES_CONSTRAIN(Tanks)..  2*X(Truck) + X(Sedans) =L= 14000 ; (LHS = 0)
+     
+RES_CONSTRAIN(Seats)..  X(Truck) + 2*X(Sedans) =L= 18000 ; (LHS = 0)
+     
+RES_CONSTRAIN(Transmissions)..  X(Truck) =L= 6000 ; (LHS = 0)
+     
+REMAINING ENTRY SKIPPED
+
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 09/24/25 12:40:50 Page 3
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Column Listing      SOLVE MANUFACTURING Using LP From line 67
+
+
+---- X  Vehicles made (Number)
+
+X(Truck)
+                (.LO, .L, .UP, .M = 0, 0, +INF, 0)
+     -100       PROFIT
+        2       RES_CONSTRAIN(Tanks)
+        1       RES_CONSTRAIN(Seats)
+        1       RES_CONSTRAIN(Transmissions)
+        1       RES_CONSTRAIN(Vehicles)
+
+X(Sedans)
+                (.LO, .L, .UP, .M = 0, 0, +INF, 0)
+     -110       PROFIT
+        1       RES_CONSTRAIN(Tanks)
+        2       RES_CONSTRAIN(Seats)
+        1       RES_CONSTRAIN(Vehicles)
+
+
+---- VPROFIT  total profit ($)
+
+VPROFIT
+                (.LO, .L, .UP, .M = -INF, 0, +INF, 0)
+        1       PROFIT
+
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 09/24/25 12:40:50 Page 4
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Range Statistics    SOLVE MANUFACTURING Using LP From line 67
+
+
+RANGE STATISTICS (ABSOLUTE NON-ZERO FINITE VALUES)
+
+RHS       [min, max] : [ 6.000E+03, 1.800E+04] - Zero values observed as well
+Bound     [min, max] : [        NA,        NA] - Zero values observed as well
+Matrix    [min, max] : [ 1.000E+00, 1.100E+02]
+
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 09/24/25 12:40:50 Page 5
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Model Statistics    SOLVE MANUFACTURING Using LP From line 67
+
+
+MODEL STATISTICS
+
+BLOCKS OF EQUATIONS           2     SINGLE EQUATIONS            5
+BLOCKS OF VARIABLES           2     SINGLE VARIABLES            3
+NON ZERO ELEMENTS            10
+
+
+GENERATION TIME      =        0.000 SECONDS      4 MB  51.1.0 2d039df5 WEX-WEI
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 09/24/25 12:40:50 Page 6
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Solution Report     SOLVE MANUFACTURING Using LP From line 67
+
+
+               S O L V E      S U M M A R Y
+
+     MODEL   MANUFACTURING       OBJECTIVE  VPROFIT
+     TYPE    LP                  DIRECTION  MAXIMIZE
+     SOLVER  CPLEX               FROM LINE  67
+
+**** SOLVER STATUS     1 Normal Completion
+**** MODEL STATUS      1 Optimal
+**** OBJECTIVE VALUE          1080000.0000
+
+ RESOURCE USAGE, LIMIT          0.000 10000000000.000
+ ITERATION COUNT, LIMIT         3    2147483647
+*** This solver runs with a community license.
+--- GMO setup time: 0.00s
+--- GMO memory 0.50 Mb (peak 0.50 Mb)
+--- Dictionary memory 0.00 Mb
+--- Cplex 22.1.2.0 link memory 0.00 Mb (peak 0.00 Mb)
+--- Starting Cplex
+
+
+--- LP status (1): optimal.
+--- Cplex Time: 0.00sec (det. 0.01 ticks)
+
+
+Optimal solution found
+Objective:      1080000.000000
+
+
+                           LOWER          LEVEL          UPPER         MARGINAL
+
+---- EQU PROFIT              .              .              .             1.0000      
+
+  PROFIT  Total profit ($) and objective function value
+
+---- EQU RES_CONSTRAIN  Resource Constraints
+
+                     LOWER          LEVEL          UPPER         MARGINAL
+
+Tanks                -INF        12000.0000     14000.0000          .          
+Seats                -INF        18000.0000     18000.0000        10.0000      
+Transmissions        -INF         2000.0000      6000.0000          .          
+Vehicles             -INF        10000.0000     10000.0000        90.0000      
+
+---- VAR X  Vehicles made (Number)
+
+              LOWER          LEVEL          UPPER         MARGINAL
+
+Truck           .          2000.0000        +INF             .          
+Sedans          .          8000.0000        +INF             .          
+
+                           LOWER          LEVEL          UPPER         MARGINAL
+
+---- VAR VPROFIT           -INF      1080000.0000        +INF             .          
+
+  VPROFIT  total profit ($)
+
+
+**** REPORT SUMMARY :        0     NONOPT
+                             0 INFEASIBLE
+                             0  UNBOUNDED
+
+
+EXECUTION TIME       =        0.063 SECONDS      4 MB  51.1.0 2d039df5 WEX-WEI
+
+
+USER: Course License                                 G250902+0003Ac-GEN
+      Utah State University                                     DCE4709
+      License for teaching and research at degree granting institutions
+
+
+**** FILE SUMMARY
+
+Input      C:\Users\bhpar\OneDrive\Documents\School\Fall 2025\System Analysis\CEE-6410-Parker\GAMS\HW#4\HW-4.gms
+Output     C:\Users\bhpar\OneDrive\Documents\School\Fall 2025\System Analysis\CEE-6410-Parker\GAMS\HW#4\HW-4.lst
