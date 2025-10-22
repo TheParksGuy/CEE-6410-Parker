@@ -1,0 +1,269 @@
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/16/25 15:55:21 Page 1
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+C o m p i l a t i o n
+
+
+      CEE 6410 Fall 2015
+      Example 8-4-1 in the Bishop et al text
+       
+      Solve the non-linear programming programming problem
+       
+      Max Z = X1 (5 - (X1)^2) + X2 (14 - 6 X2)
+      s.t.
+              X1 + 4 X2 <= 18
+              6 X1 + 2 X2 <= 26
+              (X2)^2 <= 5
+       
+      Where X1 and X2 are the two decision variables and limited to the range 0 and 3
+       
+      NEW GAMS TERMS
+      ** = Exponential operator: 3**2 = 3^2
+      NLP = Nonlinear program: SOLVE MODELX USING NLP MAXIMIZING Z
+      X("i2") = i2-th element of set i
+      X.LO = Lower limit for variable X: X.LO = 1;  (set lower limit to 1.0)
+      X.UP = Upper limit for variable X: X.UP = 3;  (set lower limit to 3.0)
+      X.L = Level for variable X: X.L = 2.5; (set level to 2.5. When this statement appears before
+                               SOLVE statement, this sets the variable initial value).
+       
+       
+      David E Rosenberg
+      david.rosenberg@usu.edu
+      September 23, 2018
+  29   
+  30  * 1. DEFINE the SETS
+  31  SETS i decision variables /i1*i2/
+  32       j linear constraints /j1*j2/;
+  33   
+  34  * 2. DEFINE the variables
+  35  VARIABLES X(i) decision variable values
+  36            PROFIT profit and objective function value;
+  37   
+  38  * Non-negativity constraints
+  39  POSITIVE VARIABLES X;
+  40   
+  41  * 3. DEFINE input data
+  42  TABLE A(j,i) linear constraint coefficients
+  43             i1    i2
+  44      j1     1     4
+  45      j2     6     2;
+  46   
+  47  PARAMETER b(j) linear right hand side constraint bounds
+  48       /j1    18,
+  49        j2    26/ ;
+  50   
+  51  * 4. COMBINE variables and data in equations
+  52  EQUATIONS
+  53     NetBen          Total profit from actions
+  54     ResReq(j)       Linear constraint requirements on resource use
+  55     NonLinReq       Nonlinear requirement on resource use;
+  56   
+  57  *                Quotes " " refer to an individual set element. Double asterics (**)is GAMS exponentiation operator
+  58  NetBen..          PROFIT =E= X("i1")*(5 - X("i1")**2) + X("i2")*(14 - 6*X("i2"));
+  59  ResReq(j)..       sum(i,A(j,i)*X(i)) =L= b(j);
+  60  NonLinReq..       X("i2")**2 =L= 5;
+  61   
+  62  * 5. DEFINE the MODEL from the EQUATIONS
+  63  MODEL NonLinModel /ALL/;
+  64   
+  65  *Directions to the solver to set lower and upper bounds (without equations)
+  66  *for all decision variables to zero and 3
+  67  X.LO(i) = 0;
+  68  X.UP(i) = 3;
+  69  *Direction to the solver to specify the initial variable value levels (initial start point)
+  70  X.L("i1") = 0;
+  71  X.L("i2") = 3;
+  72  *This next statement overwrites the prior initialization statements.
+  73  *Starting point is now {0.0}
+  74  *X.L(i) = 0;
+  75   
+  76  * 6. Solve the Model as an LP (relaxed IP)
+  77  SOLVE NonLinModel USING NLP Maximizing PROFIT;
+  78   
+  79  DISPLAY X.L, Profit.L;
+
+
+COMPILATION TIME     =        0.000 SECONDS      3 MB  51.1.0 2d039df5 WEX-WEI
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/16/25 15:55:21 Page 2
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Equation Listing    SOLVE NonLinModel Using NLP From line 77
+
+
+---- NetBen  =E=  Total profit from actions
+
+NetBen..  - (5)*X(i1) + (22)*X(i2) + PROFIT =E= 0 ; (LHS = 12, INFES = 12 ****)
+     
+
+---- ResReq  =L=  Linear constraint requirements on resource use
+
+ResReq(j1)..  X(i1) + 4*X(i2) =L= 18 ; (LHS = 12)
+     
+ResReq(j2)..  6*X(i1) + 2*X(i2) =L= 26 ; (LHS = 6)
+     
+
+---- NonLinReq  =L=  Nonlinear requirement on resource use
+
+NonLinReq..  (6)*X(i2) =L= 5 ; (LHS = 9, INFES = 4 ****)
+     
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/16/25 15:55:21 Page 3
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Column Listing      SOLVE NonLinModel Using NLP From line 77
+
+
+---- X  decision variable values
+
+X(i1)
+                (.LO, .L, .UP, .M = 0, 0, 3, 0)
+      (-5)      NetBen
+        1       ResReq(j1)
+        6       ResReq(j2)
+
+X(i2)
+                (.LO, .L, .UP, .M = 0, 3, 3, 0)
+      (22)      NetBen
+        4       ResReq(j1)
+        2       ResReq(j2)
+       (6)      NonLinReq
+
+
+---- PROFIT  profit and objective function value
+
+PROFIT
+                (.LO, .L, .UP, .M = -INF, 0, +INF, 0)
+        1       NetBen
+
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/16/25 15:55:21 Page 4
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Range Statistics    SOLVE NonLinModel Using NLP From line 77
+
+
+RANGE STATISTICS (ABSOLUTE NON-ZERO FINITE VALUES)
+
+RHS       [min, max] : [ 5.000E+00, 2.600E+01] - Zero values observed as well
+Bound     [min, max] : [ 3.000E+00, 3.000E+00] - Zero values observed as well
+Matrix    [min, max] : [ 1.000E+00, 2.200E+01]
+
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/16/25 15:55:21 Page 5
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Model Statistics    SOLVE NonLinModel Using NLP From line 77
+
+
+MODEL STATISTICS
+
+BLOCKS OF EQUATIONS           3     SINGLE EQUATIONS            4
+BLOCKS OF VARIABLES           2     SINGLE VARIABLES            3
+NON ZERO ELEMENTS             8     NON LINEAR N-Z              3
+CODE LENGTH                  21     CONSTANT POOL              18
+
+
+GENERATION TIME      =        0.015 SECONDS      4 MB  51.1.0 2d039df5 WEX-WEI
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/16/25 15:55:21 Page 6
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Solution Report     SOLVE NonLinModel Using NLP From line 77
+
+
+               S O L V E      S U M M A R Y
+
+     MODEL   NonLinModel         OBJECTIVE  PROFIT
+     TYPE    NLP                 DIRECTION  MAXIMIZE
+     SOLVER  CONOPT              FROM LINE  77
+
+**** SOLVER STATUS     1 Normal Completion
+**** MODEL STATUS      2 Locally Optimal
+**** OBJECTIVE VALUE               12.4700
+
+ RESOURCE USAGE, LIMIT          0.078 10000000000.000
+ ITERATION COUNT, LIMIT         5    2147483647
+ EVALUATION ERRORS              0             0
+ 
+ 
+    C O N O P T   version 4.38.1
+    Copyright (C) GAMS Software GmbH
+                  GAMS Development Corporation
+ 
+    Will use up to 4 threads.
+ 
+ 
+    The user model has 4 constraints and 3 variables
+    with 8 Jacobian elements, 3 of which are nonlinear.
+    The Hessian of the Lagrangian has 2 elements on the diagonal,
+    0 elements below the diagonal, and 2 nonlinear variables.
+ 
+    The pre-triangular part of the model has 2 constraints and 0 variables.
+    The post-triangular part of the model has 1 constraints and variables.
+ 
+    Preprocessed model has 1 constraints and 2 variables
+    with 1 Jacobian elements, 1 of which are nonlinear.
+ 
+ ** Optimal solution. Reduced gradient less than tolerance.
+ 
+ 
+ CONOPT time Total                            0.049 seconds
+   of which: Function evaluations             0.000 =  0.0%
+             1st Derivative evaluations       0.000 =  0.0%
+             2nd Derivative evaluations       0.000 =  0.0%
+             Directional 2nd Deriv(Hess)      0.000 =  0.0%
+             Interval derivative evals        0.000 =  0.0%
+ 
+
+                           LOWER          LEVEL          UPPER         MARGINAL
+
+---- EQU NetBen              .              .              .             1.0000      
+
+  NetBen  Total profit from actions
+
+---- EQU ResReq  Linear constraint requirements on resource use
+
+          LOWER          LEVEL          UPPER         MARGINAL
+
+j1        -INF            5.9577        18.0000          .          
+j2        -INF           10.0793        26.0000          .          
+
+                           LOWER          LEVEL          UPPER         MARGINAL
+
+---- EQU NonLinReq         -INF            1.3611         5.0000          .          
+
+  NonLinReq  Nonlinear requirement on resource use
+
+---- VAR X  decision variable values
+
+          LOWER          LEVEL          UPPER         MARGINAL
+
+i1          .             1.2910         3.0000   -2.497508E-9      
+i2          .             1.1667         3.0000         EPS         
+
+                           LOWER          LEVEL          UPPER         MARGINAL
+
+---- VAR PROFIT            -INF           12.4700        +INF             .          
+
+  PROFIT  profit and objective function value
+
+
+**** REPORT SUMMARY :        0     NONOPT
+                             0 INFEASIBLE
+                             0  UNBOUNDED
+                             0     ERRORS
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/16/25 15:55:21 Page 7
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+E x e c u t i o n
+
+
+----     79 VARIABLE X.L  decision variable values
+
+i1 1.291,    i2 1.167
+
+
+----     79 VARIABLE PROFIT.L              =       12.470  profit and objective function value
+
+
+EXECUTION TIME       =        0.125 SECONDS      4 MB  51.1.0 2d039df5 WEX-WEI
+
+
+USER: Course License                                 G250902+0003Ac-GEN
+      Utah State University                                     DCE4709
+      License for teaching and research at degree granting institutions
+
+
+**** FILE SUMMARY
+
+Input      C:\Users\bhpar\OneDrive\Documents\School\Fall 2025\System Analysis\CEE-6410-Parker\GAMS\EX 8-1\Ex8-4-1.gms
+Output     C:\Users\bhpar\OneDrive\Documents\School\Fall 2025\System Analysis\CEE-6410-Parker\GAMS\EX 8-1\Ex8-4-1.lst

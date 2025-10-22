@@ -1,0 +1,30 @@
+B 3 C o m p i l a t i o n
+B 87 Equation Listing    SOLVE PLANTING Using LP From line 75
+D 90 PROFIT
+D 95 RES_CONSTRAIN
+B 107 Column Listing      SOLVE PLANTING Using LP From line 75
+E 110 X
+E 128 VPROFIT
+B 136 Range Statistics    SOLVE PLANTING Using LP From line 75
+B 147 Model Statistics    SOLVE PLANTING Using LP From line 75
+B 160 Solution Report     SOLVE PLANTING Using LP From line 75
+F 193 PROFIT
+F 197 RES_CONSTRAIN
+G 206 X
+G 215 VPROFIT
+B 225 Equation Listing    SOLVE DualPLANTING Using LP From line 76
+D 228 DualExpense
+D 233 Plnt_Constrain
+B 241 Column Listing      SOLVE DualPLANTING Using LP From line 76
+E 244 Y
+E 265 DualCOST
+B 273 Range Statistics    SOLVE DualPLANTING Using LP From line 76
+B 284 Model Statistics    SOLVE DualPLANTING Using LP From line 76
+B 297 Solution Report     SOLVE DualPLANTING Using LP From line 76
+F 330 DualExpense
+F 334 Plnt_Constrain
+G 341 Y
+G 352 DualCOST
+B 360 E x e c u t i o n
+I 362 VPROFIT
+I 363 DualCOST

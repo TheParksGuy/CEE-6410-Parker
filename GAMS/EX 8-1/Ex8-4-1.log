@@ -1,0 +1,80 @@
+
+--- Job Ex8-4-1.gms Start 10/16/25 15:55:21 51.1.0 2d039df5 WEX-WEI x86 64bit/MS Windows
+--- Applying:
+    C:\GAMS\51\gmsprmNT.txt
+--- GAMS Parameters defined
+    Input "C:\Users\bhpar\OneDrive\Documents\School\Fall 2025\System Analysis\CEE-6410-Parker\GAMS\EX 8-1\Ex8-4-1.gms"
+    PageSize 0
+    ScrDir "C:\Users\bhpar\OneDrive\Documents\School\Fall 2025\System Analysis\CEE-6410-Parker\GAMS\EX 8-1\225a\"
+    SysDir C:\GAMS\51\
+    LogOption 3
+    AppendLog 1
+    ErrMsg 1
+    ErrorLog 99
+    IDE 1
+    LstTitleLeftAligned 1
+Licensee: Course License                                 G250902+0003Ac-GEN
+          Utah State University                                     DCE4709
+          225a\gamslice.dat
+          node:23533203 mem:32 cores:8 ipport:59299 uses:0@0 v:2           
+          Course license for use within the course and related course work
+          The expiration date of time-limited license is Dec 31, 2025
+System information: 8 physical cores and 32 Gb physical memory detected
+GAMS 51.1.0   Copyright (C) 1987-2025 GAMS Development. All rights reserved
+--- Starting compilation
+--- Ex8-4-1.gms(79) 3 Mb
+--- Starting execution: elapsed 0:00:00.025
+--- Ex8-4-1.gms(71) 4 Mb
+--- Generating NLP model NonLinModel
+--- Ex8-4-1.gms(77) 6 Mb
+---   4 rows  3 columns  8 non-zeroes
+---   21 nl-code  3 nl-non-zeroes
+--- Range statistics (absolute non-zero finite values)
+--- RHS       [min, max] : [ 5.000E+00, 2.600E+01] - Zero values observed as well
+--- Bound     [min, max] : [ 3.000E+00, 3.000E+00] - Zero values observed as well
+--- Matrix    [min, max] : [ 1.000E+00, 2.200E+01]
+--- Ex8-4-1.gms(77) 4 Mb
+--- Executing CONOPT (Solvelink=2): elapsed 0:00:00.030
+
+CONOPT 4         51.1.0 2d039df5 Sep 13, 2025          WEI x86 64bit/MS Window
+
+ 
+ 
+    C O N O P T   version 4.38.1
+    Copyright (C) GAMS Software GmbH
+                  GAMS Development Corporation
+ 
+    Will use up to 4 threads.
+ 
+ 
+    The user model has 4 constraints and 3 variables
+    with 8 Jacobian elements, 3 of which are nonlinear.
+    The Hessian of the Lagrangian has 2 elements on the diagonal,
+    0 elements below the diagonal, and 2 nonlinear variables.
+ 
+    Iter Phase   Ninf   Infeasibility   RGmax      NSB   Step  InItr MX OK
+       0   0          1.6000000000E+01 (Input point)
+ 
+    The pre-triangular part of the model has 2 constraints and 0 variables.
+    The post-triangular part of the model has 1 constraints and variables.
+ 
+    Preprocessed model has 1 constraints and 2 variables
+    with 1 Jacobian elements, 1 of which are nonlinear.
+ 
+    Iter Phase   Ninf   Infeasibility   RGmax      NSB   Step  InItr MX OK
+                      0.0000000000E+00 (Full preprocessed model)
+                      0.0000000000E+00 (After scaling)
+ 
+ ** Feasible solution. Value of objective =    1.30495168500
+ 
+    Iter Phase   Ninf     Objective     RGmax      NSB   Step  InItr MX OK
+       1   3          1.2125129846E+01 2.6E+01       2 3.8E-01     1 F  T
+       5   4          1.2469981496E+01 2.5E-09       2
+ 
+ ** Optimal solution. Reduced gradient less than tolerance.
+ 
+--- Reading solution for model NonLinModel
+--- Executing after solve: elapsed 0:00:00.141
+--- Ex8-4-1.gms(79) 4 Mb
+*** Status: Normal completion
+--- Job Ex8-4-1.gms Stop 10/16/25 15:55:21 elapsed 0:00:00.142

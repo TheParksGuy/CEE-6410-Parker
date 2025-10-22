@@ -1,0 +1,449 @@
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/22/25 12:09:34 Page 1
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+C o m p i l a t i o n
+
+
+      CEE 6410 Fall 2025 HW #6
+      A farmer plans to develop water for irrigation. He is considering two possible sources of
+      water: a gravity diversion from a possible reservoir with two alternative capacities and/or a
+      pump from a lower river diversion (refer to Figure 7.3). Between the reservoir and pump
+      site the river base flow increases by 2 acft/day due to groundwater drainage into the river.
+      Ignore losses from the reservoir. The river flow into the reservoir and the farmer's demand
+      during each of two six-month seasons of the year are given in Table 7.5. Revenue is estimated
+      at $300 per year per acre irrigated.
+          
+          Season      River Inflow (acft)     Irrigation Deamand (acft/acre)
+          1           600                     1
+          2           200                     3
+          
+      Assume that there are only two possible sizes of reservoir: a high dam that has capacity of
+      700 acft or a low dam with capacity of 300 acft. The capital costs are $10,000/year and
+      $6,000/year for the high and low dams, respectively (no operating cost). The pump capacity
+      is fixed at 2.2 acft/day with a capital cost (if it is built) of $8,000/year and operating cost
+      of $20/acft.
+  21   
+  22  * 1. DEFINE the SETS
+  23  SETS
+  24      src water supply sources
+  25          /res "from reservoir", ps "pump station"/
+  26      time time in which things happen
+  27          /t1 "season 1",t2 "season 2"/
+  28      size source size
+  29          /L0 "none",L1 "small", L2 "large"/;
+  30   
+  31  * 2. DEFINE input data
+  32  PARAMETERS
+  33      OpCost(src) operating cost ($ per ac-ft)
+  34          /res 0,
+  35           ps  20/
+  36      TotDemand  Total Demand (ac-ft per acre)
+  37          /t1 1,
+  38           t2 3/
+  39      RiverInflow River Inflow (acft)
+  40          /t1 600,
+  41           t2 200/
+  42      GrndWater Groundwater flow into river DS of the reservoir
+  43          /2/
+  44      IntStor starting reservoir storage
+  45          /0/
+  46      Rev Revenue from ac irrigated
+  47          /300/;
+  48   
+  49  TABLE
+  50      CapCost(src,size) the cost to build ($)
+  51                  L1      L2
+  52          res     6000    10000
+  53          ps      8000            ;
+  54  TABLE
+  55      MaxCap(src,size) capacity of source after built in acre-ft
+  56                  L1      L2
+  57          res     300     700;
+  58   
+  59  * 3. DEFINE the variables
+  60  VARIABLES
+  61      I(src,size)      Binary decision to build or do prject from source src (1=yes 0=no)
+  62      X(src,time)      Volume of water provided by source src (ac-ft per year)
+  63      REL(time)   Release of the reservoir per season
+  64      STOR(time)  Amount stored in Reservoir per season
+  65      TBEN        Total net benefits Revenue minus Capital and Operating costs
+  66      Acres       The amount of acres planted;
+  67   
+  68  BINARY VARIABLES I;
+  69  * Non-negativity constraints
+  70  POSITIVE VARIABLES X,REL,STOR;
+  71   
+  72  * 4. COMBINE variables and data in equations
+  73  EQUATIONS
+  74      NetBen              Revenue minus the capital and operating cost and objective function value
+  75      AreaToSupply(time)  Area to supply irrigation too (ac)
+  76      PumpCap(time)       Pumping capacity in each time step (ac-ft per season)
+  77      ResCap(time)        Reservoir storage within the capacity per time step (ac-ft)
+  78      MutualExcl(src)     Can only use one size of Reservoir
+  79      RivMassBal(time)    River mass balance downstream of reservoir per time step (ac-ft)
+  80      ResMassBal(time)    Reservoir mass balance per time step (ac-ft)
+  81      ;
+  82   
+  83  NetBen..                TBEN =E= Rev * Acres - SUM(src,SUM(size,CapCost(src,size)*I(src,size)) + SUM(time,OpCost(src)*X(src,time)));
+  84  AreaToSupply(time)..    Acres =L= SUM(src,X(src,time))/TotDemand(time);
+  85  PumpCap(time)..         X('ps',time) =L= SUM(size,MaxCap('ps',size)*I('ps',size));
+  86  ResCap(time)..          STOR(time) =L= SUM(size,MaxCap('res',size)*I('res',size));
+  87  RivMassBal(time)..      X('ps',time) =L= REL(time) + GrndWater;
+  88  MutualExcl(src)..       SUM(size,I(src,size)) =L= 1;
+  89  ResMassBal(time)..      STOR(time) =E= RiverInflow(time) - REL(time) - X('res',time) +
+  90                                          IntStor * SUM(size,MaxCap('res',size)*I('res',size))$(ord(time) eq 1) +
+  91                                          STOR(time-1)$(ord(time) gt 1);
+  92   
+  93  * 5. DEFINE the MODEL from the EQUATIONS
+  94  MODEL ReservoirDesign /ALL/;
+  95   
+  96  * 6. Solve the Model as an LP (relaxed IP)
+  97  SOLVE ReservoirDesign USING MIP MAXIMIZING TBEN;
+  98   
+  99  DISPLAY X.L, I.L, TBEN.L,Acres.L;
+ 100   
+      * Dump all input data and results to a GAMS gdx file
+      Execute_Unload "Ex6-3-integer.gdx";
+      * Dump the gdx file to an Excel workbook
+      Execute "gdx2xls Ex6-3-integer.gdx"
+
+
+COMPILATION TIME     =        0.000 SECONDS      3 MB  51.1.0 2d039df5 WEX-WEI
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/22/25 12:09:34 Page 2
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Equation Listing    SOLVE ReservoirDesign Using MIP From line 97
+
+
+---- NetBen  =E=  Revenue minus the capital and operating cost and objective function value
+
+NetBen..  6000*I(res,L1) + 10000*I(res,L2) + 8000*I(ps,L1) + 20*X(ps,t1) + 20*X(ps,t2) + TBEN - 300*Acres =E= 0 ; (LHS = 0)
+     
+
+---- AreaToSupply  =L=  Area to supply irrigation too (ac)
+
+AreaToSupply(t1)..  - X(res,t1) - X(ps,t1) + Acres =L= 0 ; (LHS = 0)
+     
+AreaToSupply(t2)..  - 0.333333333333333*X(res,t2) - 0.333333333333333*X(ps,t2) + Acres =L= 0 ; (LHS = 0)
+     
+
+---- PumpCap  =L=  Pumping capacity in each time step (ac-ft per season)
+
+PumpCap(t1)..  X(ps,t1) =L= 0 ; (LHS = 0)
+     
+PumpCap(t2)..  X(ps,t2) =L= 0 ; (LHS = 0)
+     
+
+---- ResCap  =L=  Reservoir storage within the capacity per time step (ac-ft)
+
+ResCap(t1)..  - 300*I(res,L1) - 700*I(res,L2) + STOR(t1) =L= 0 ; (LHS = 0)
+     
+ResCap(t2)..  - 300*I(res,L1) - 700*I(res,L2) + STOR(t2) =L= 0 ; (LHS = 0)
+     
+
+---- MutualExcl  =L=  Can only use one size of Reservoir
+
+MutualExcl(res)..  I(res,L0) + I(res,L1) + I(res,L2) =L= 1 ; (LHS = 0)
+     
+MutualExcl(ps)..  I(ps,L0) + I(ps,L1) + I(ps,L2) =L= 1 ; (LHS = 0)
+     
+
+---- RivMassBal  =L=  River mass balance downstream of reservoir per time step (ac-ft)
+
+RivMassBal(t1)..  X(ps,t1) - REL(t1) =L= 2 ; (LHS = 0)
+     
+RivMassBal(t2)..  X(ps,t2) - REL(t2) =L= 2 ; (LHS = 0)
+     
+
+---- ResMassBal  =E=  Reservoir mass balance per time step (ac-ft)
+
+ResMassBal(t1)..  X(res,t1) + REL(t1) + STOR(t1) =E= 600 ; (LHS = 0, INFES = 600 ****)
+     
+ResMassBal(t2)..  X(res,t2) + REL(t2) - STOR(t1) + STOR(t2) =E= 200 ; (LHS = 0, INFES = 200 ****)
+     
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/22/25 12:09:34 Page 3
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Column Listing      SOLVE ReservoirDesign Using MIP From line 97
+
+
+---- I  Binary decision to build or do prject from source src (1=yes 0=no)
+
+I(res,L0)
+                (.LO, .L, .UP, .M = 0, 0, 1, 0)
+        1       MutualExcl(res)
+
+I(res,L1)
+                (.LO, .L, .UP, .M = 0, 0, 1, 0)
+     6000       NetBen
+     -300       ResCap(t1)
+     -300       ResCap(t2)
+        1       MutualExcl(res)
+
+I(res,L2)
+                (.LO, .L, .UP, .M = 0, 0, 1, 0)
+    10000       NetBen
+     -700       ResCap(t1)
+     -700       ResCap(t2)
+        1       MutualExcl(res)
+
+REMAINING 3 ENTRIES SKIPPED
+
+---- X  Volume of water provided by source src (ac-ft per year)
+
+X(res,t1)
+                (.LO, .L, .UP, .M = 0, 0, +INF, 0)
+       -1       AreaToSupply(t1)
+        1       ResMassBal(t1)
+
+X(res,t2)
+                (.LO, .L, .UP, .M = 0, 0, +INF, 0)
+       -0.3333  AreaToSupply(t2)
+        1       ResMassBal(t2)
+
+X(ps,t1)
+                (.LO, .L, .UP, .M = 0, 0, +INF, 0)
+       20       NetBen
+       -1       AreaToSupply(t1)
+        1       PumpCap(t1)
+        1       RivMassBal(t1)
+
+REMAINING ENTRY SKIPPED
+
+---- REL  Release of the reservoir per season
+
+REL(t1)
+                (.LO, .L, .UP, .M = 0, 0, +INF, 0)
+       -1       RivMassBal(t1)
+        1       ResMassBal(t1)
+
+REL(t2)
+                (.LO, .L, .UP, .M = 0, 0, +INF, 0)
+       -1       RivMassBal(t2)
+        1       ResMassBal(t2)
+
+
+---- STOR  Amount stored in Reservoir per season
+
+STOR(t1)
+                (.LO, .L, .UP, .M = 0, 0, +INF, 0)
+        1       ResCap(t1)
+        1       ResMassBal(t1)
+       -1       ResMassBal(t2)
+
+STOR(t2)
+                (.LO, .L, .UP, .M = 0, 0, +INF, 0)
+        1       ResCap(t2)
+        1       ResMassBal(t2)
+
+
+---- TBEN  Total net benefits Revenue minus Capital and Operating costs
+
+TBEN
+                (.LO, .L, .UP, .M = -INF, 0, +INF, 0)
+        1       NetBen
+
+
+---- Acres  The amount of acres planted
+
+Acres
+                (.LO, .L, .UP, .M = -INF, 0, +INF, 0)
+     -300       NetBen
+        1       AreaToSupply(t1)
+        1       AreaToSupply(t2)
+
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/22/25 12:09:34 Page 4
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Range Statistics    SOLVE ReservoirDesign Using MIP From line 97
+
+
+RANGE STATISTICS (ABSOLUTE NON-ZERO FINITE VALUES)
+
+RHS       [min, max] : [ 1.000E+00, 6.000E+02] - Zero values observed as well
+Bound     [min, max] : [ 1.000E+00, 1.000E+00] - Zero values observed as well
+Matrix    [min, max] : [ 3.333E-01, 1.000E+04]
+
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/22/25 12:09:34 Page 5
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Model Statistics    SOLVE ReservoirDesign Using MIP From line 97
+
+
+MODEL STATISTICS
+
+BLOCKS OF EQUATIONS           7     SINGLE EQUATIONS           13
+BLOCKS OF VARIABLES           6     SINGLE VARIABLES           16
+NON ZERO ELEMENTS            38     DISCRETE VARIABLES          6
+
+
+GENERATION TIME      =        0.078 SECONDS      4 MB  51.1.0 2d039df5 WEX-WEI
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/22/25 12:09:34 Page 6
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Solution Report     SOLVE ReservoirDesign Using MIP From line 97
+
+
+               S O L V E      S U M M A R Y
+
+     MODEL   ReservoirDesign     OBJECTIVE  TBEN
+     TYPE    MIP                 DIRECTION  MAXIMIZE
+     SOLVER  CPLEX               FROM LINE  97
+
+**** SOLVER STATUS     1 Normal Completion
+**** MODEL STATUS      1 Optimal
+**** OBJECTIVE VALUE            50000.0000
+
+ RESOURCE USAGE, LIMIT          0.031 10000000000.000
+ ITERATION COUNT, LIMIT         4    2147483647
+*** This solver runs with a community license.
+--- GMO setup time: 0.00s
+--- GMO memory 0.50 Mb (peak 0.50 Mb)
+--- Dictionary memory 0.00 Mb
+--- Cplex 22.1.2.0 link memory 0.00 Mb (peak 0.00 Mb)
+--- Starting Cplex
+
+
+--- MIP status (101): integer optimal solution.
+--- Cplex Time: 0.03sec (det. 0.07 ticks)
+
+--- Returning a primal only solution to GAMS (marginals all set to NA).
+--- Fixing integer variables and solving final LP...
+
+
+--- Fixed MIP status (1): optimal.
+--- Cplex Time: 0.00sec (det. 0.02 ticks)
+
+
+Proven optimal solution
+MIP Solution:        50000.000000    (4 iterations, 0 nodes)
+Final Solve:         50000.000000    (4 iterations)
+
+Best possible:       50000.000000
+Absolute gap:           -0.000000
+Relative gap:           -0.000000
+
+
+                           LOWER          LEVEL          UPPER         MARGINAL
+
+---- EQU NetBen              .              .              .             1.0000      
+
+  NetBen  Revenue minus the capital and operating cost and objective function value
+
+---- EQU AreaToSupply  Area to supply irrigation too (ac)
+
+          LOWER          LEVEL          UPPER         MARGINAL
+
+t1        -INF             .              .            75.0000      
+t2        -INF             .              .           225.0000      
+
+---- EQU PumpCap  Pumping capacity in each time step (ac-ft per season)
+
+          LOWER          LEVEL          UPPER         MARGINAL
+
+t1        -INF             .              .            55.0000      
+t2        -INF             .              .            55.0000      
+
+---- EQU ResCap  Reservoir storage within the capacity per time step (ac-ft)
+
+          LOWER          LEVEL          UPPER         MARGINAL
+
+t1        -INF         -300.0000          .              .          
+t2        -INF         -700.0000          .              .          
+
+---- EQU MutualExcl  Can only use one size of Reservoir
+
+           LOWER          LEVEL          UPPER         MARGINAL
+
+res        -INF            1.0000         1.0000          .          
+ps         -INF             .             1.0000          .          
+
+---- EQU RivMassBal  River mass balance downstream of reservoir per time step (ac-ft)
+
+          LOWER          LEVEL          UPPER         MARGINAL
+
+t1        -INF             .             2.0000          .          
+t2        -INF             .             2.0000          .          
+
+---- EQU ResMassBal  Reservoir mass balance per time step (ac-ft)
+
+          LOWER          LEVEL          UPPER         MARGINAL
+
+t1       600.0000       600.0000       600.0000        75.0000      
+t2       200.0000       200.0000       200.0000        75.0000      
+
+---- VAR I  Binary decision to build or do prject from source src (1=yes 0=no)
+
+              LOWER          LEVEL          UPPER         MARGINAL
+
+res.L0          .              .             1.0000         EPS         
+res.L1          .              .             1.0000     -6000.0000      
+res.L2          .             1.0000         1.0000    -10000.0000      
+ps .L0          .              .             1.0000         EPS         
+ps .L1          .              .             1.0000     -8000.0000      
+ps .L2          .              .             1.0000         EPS         
+
+---- VAR X  Volume of water provided by source src (ac-ft per year)
+
+              LOWER          LEVEL          UPPER         MARGINAL
+
+res.t1          .           200.0000        +INF             .          
+res.t2          .           600.0000        +INF             .          
+ps .t1          .              .            +INF             .          
+ps .t2          .              .            +INF             .          
+
+---- VAR REL  Release of the reservoir per season
+
+          LOWER          LEVEL          UPPER         MARGINAL
+
+t1          .              .            +INF          -75.0000      
+t2          .              .            +INF          -75.0000      
+
+---- VAR STOR  Amount stored in Reservoir per season
+
+          LOWER          LEVEL          UPPER         MARGINAL
+
+t1          .           400.0000        +INF             .          
+t2          .              .            +INF          -75.0000      
+
+                           LOWER          LEVEL          UPPER         MARGINAL
+
+---- VAR TBEN              -INF        50000.0000        +INF             .          
+---- VAR Acres             -INF          200.0000        +INF             .          
+
+  TBEN  Total net benefits Revenue minus Capital and Operating costs
+  Acres  The amount of acres planted
+
+
+**** REPORT SUMMARY :        0     NONOPT
+                             0 INFEASIBLE
+                             0  UNBOUNDED
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/22/25 12:09:34 Page 7
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+E x e c u t i o n
+
+
+----     99 VARIABLE X.L  Volume of water provided by source src (ac-ft per year)
+
+             t1          t2
+
+res     200.000     600.000
+
+
+----     99 VARIABLE I.L  Binary decision to build or do prject from source src (1=yes 0=no)
+
+             L2
+
+res       1.000
+
+
+----     99 VARIABLE TBEN.L                =    50000.000  Total net benefits Revenue minus Capital and Operating costs
+            VARIABLE Acres.L               =      200.000  The amount of acres planted
+
+
+EXECUTION TIME       =        0.375 SECONDS      4 MB  51.1.0 2d039df5 WEX-WEI
+
+
+USER: Course License                                 G250902+0003Ac-GEN
+      Utah State University                                     DCE4709
+      License for teaching and research at degree granting institutions
+
+
+**** FILE SUMMARY
+
+Input      C:\Users\bhpar\OneDrive\Documents\School\Fall 2025\System Analysis\CEE-6410-Parker\GAMS\HW#6\HW6 (7-1).gms
+Output     C:\Users\bhpar\OneDrive\Documents\School\Fall 2025\System Analysis\CEE-6410-Parker\GAMS\HW#6\HW6 (7-1).lst

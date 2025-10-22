@@ -1,0 +1,37 @@
+B 3 C o m p i l a t i o n
+B 113 Equation Listing    SOLVE ReservoirDesign Using MIP From line 97
+D 116 NetBen
+D 121 AreaToSupply
+D 128 PumpCap
+D 135 ResCap
+D 142 MutualExcl
+D 149 RivMassBal
+D 156 ResMassBal
+B 164 Column Listing      SOLVE ReservoirDesign Using MIP From line 97
+E 167 I
+E 189 X
+E 210 REL
+E 223 STOR
+E 237 TBEN
+E 244 Acres
+B 254 Range Statistics    SOLVE ReservoirDesign Using MIP From line 97
+B 265 Model Statistics    SOLVE ReservoirDesign Using MIP From line 97
+B 278 Solution Report     SOLVE ReservoirDesign Using MIP From line 97
+F 323 NetBen
+F 327 AreaToSupply
+F 334 PumpCap
+F 341 ResCap
+F 348 MutualExcl
+F 355 RivMassBal
+F 362 ResMassBal
+G 369 I
+G 380 X
+G 389 REL
+G 396 STOR
+G 405 TBEN
+G 406 Acres
+B 417 E x e c u t i o n
+I 417 X
+I 425 I
+I 433 TBEN
+I 434 Acres

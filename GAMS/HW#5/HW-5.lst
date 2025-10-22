@@ -1,4 +1,4 @@
-GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/01/25 10:56:41 Page 1
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/01/25 22:50:35 Page 1
 G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
 C o m p i l a t i o n
 
@@ -95,46 +95,50 @@ C o m p i l a t i o n
   92      LASTANDFIRSTRESBAL The final reservoir level must be greater then the initail
   93      FinalReservoirCAP Limit of the final reservoir level
   94      InitialReservoir The starting storage of the reservoir
-  95      ;
+  95      IrrigationMinimum The minimum irrigation in months 1-3
   96   
-  97   
-  98  PROFIT..                                VPROFIT =E= SUM(Month, HydroBenefits(Month) * X("Turbine",Month) + IrrigationBenefits(Month) * X("Irrigation",Month));
+  97      ;
+  98   
   99   
- 100  TURBINE_CAP(Month) ..                   X("Turbine",Month) =L= TurbineCapacity;
+ 100  PROFIT..                                VPROFIT =E= SUM(Month, HydroBenefits(Month) * X("Turbine",Month) + IrrigationBenefits(Month) * X("Irrigation",Month));
  101   
- 102  MINIMUMFLOWATA(Month) ..                X("FlowA",Month) =G= MinFlowAtA;
+ 102  TURBINE_CAP(Month) ..                   X("Turbine",Month) =L= TurbineCapacity;
  103   
- 104  RESMASSBAL(Month)$(ord(Month) lt 6) ..  X("ReservoirStorage",Month) + ReservoirInflow(Month) - X("Turbine",Month) - X("Spill",Month) =E= X("ReservoirStorage",Month+1);
+ 104  MINIMUMFLOWATA(Month) ..                X("FlowA",Month) =G= MinFlowAtA;
  105   
- 106  FINALRESMASSBAL(month) ..               X("ReservoirStorage","Month6") + ReservoirInflow("Month6") - X("Turbine","Month6") - X("Spill","Month6") =E= FinalStorage;
+ 106  RESMASSBAL(Month)$(ord(Month) lt 6) ..  X("ReservoirStorage",Month) + ReservoirInflow(Month) - X("Turbine",Month) - X("Spill",Month) =E= X("ReservoirStorage",Month+1);
  107   
- 108  MAXRESSTORAGE(Month) ..                 X("ReservoirStorage",Month) =L= MaximumReservoirStorage;
+ 108  FINALRESMASSBAL(month) ..               X("ReservoirStorage","Month6") + ReservoirInflow("Month6") - X("Turbine","Month6") - X("Spill","Month6") =E= FinalStorage;
  109   
- 110  MASSBALATC(Month) ..                    X("Spill",Month) + X("Turbine",Month) =G= X("Irrigation",Month) + X("FlowA",Month);
+ 110  MAXRESSTORAGE(Month) ..                 X("ReservoirStorage",Month) =L= MaximumReservoirStorage;
  111   
- 112  LASTANDFIRSTRESBAL ..                   ResInitialStor =L= FinalStorage;
+ 112  MASSBALATC(Month) ..                    X("Spill",Month) + X("Turbine",Month) =G= X("Irrigation",Month) + X("FlowA",Month);
  113   
- 114  FinalReservoirCAP ..                    MaximumReservoirStorage =G= FinalStorage;
+ 114  LASTANDFIRSTRESBAL ..                   ResInitialStor =L= FinalStorage;
  115   
- 116  InitialReservoir ..                     X("ReservoirStorage","Month1") =E= ResInitialStor;
+ 116  FinalReservoirCAP ..                    MaximumReservoirStorage =G= FinalStorage;
  117   
- 118   
- 119  * 5. DEFINE the MODEL from the EQUATIONS
- 120  MODEL WATERDISTRIBUTION /ALL/;
+ 118  InitialReservoir ..                     X("ReservoirStorage","Month1") =E= ResInitialStor;
+ 119   
+ 120  IrrigationMinimum(month)$(ord(month) lt 4) .. X("irrigation",month) =G= 1;
  121   
  122   
- 123  * 6. SOLVE the MODEL
- 124  * Solve the WATERDISTRIBUTION model using a Linear Programming Solver (see File=>Options=>Solvers)
- 125  *     to maximize VPROFIT
- 126   SOLVE WATERDISTRIBUTION USING LP MAXIMIZING VPROFIT;
- 127   
- 128  * 6. CLick File menu => RUN (F9) or Solve icon and examine solution report in .LST file
+ 123  * 5. DEFINE the MODEL from the EQUATIONS
+ 124  MODEL WATERDISTRIBUTION /ALL/;
+ 125   
+ 126   
+ 127  * 6. SOLVE the MODEL
+ 128  * Solve the WATERDISTRIBUTION model using a Linear Programming Solver (see File=>Options=>Solvers)
+ 129  *     to maximize VPROFIT
+ 130   SOLVE WATERDISTRIBUTION USING LP MAXIMIZING VPROFIT;
+ 131   
+ 132  * 6. CLick File menu => RUN (F9) or Solve icon and examine solution report in .LST file
 
 
 COMPILATION TIME     =        0.000 SECONDS      3 MB  51.1.0 2d039df5 WEX-WEI
-GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/01/25 10:56:41 Page 2
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/01/25 22:50:35 Page 2
 G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
-Equation Listing    SOLVE WATERDISTRIBUTION Using LP From line 126
+Equation Listing    SOLVE WATERDISTRIBUTION Using LP From line 130
 
 
 ---- PROFIT  =E=  Total profit ($) and objective function value
@@ -222,9 +226,18 @@ FinalReservoirCAP..  - FinalStorage =G= -9 ; (LHS = 0)
 
 InitialReservoir..  X(ReservoirStorage,Month1) =E= 5 ; (LHS = 0, INFES = 5 ****)
      
-GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/01/25 10:56:41 Page 3
+
+---- IrrigationMinimum  =G=  The minimum irrigation in months 1-3
+
+IrrigationMinimum(Month1)..  X(Irrigation,Month1) =G= 1 ; (LHS = 0, INFES = 1 ****)
+     
+IrrigationMinimum(Month2)..  X(Irrigation,Month2) =G= 1 ; (LHS = 0, INFES = 1 ****)
+     
+IrrigationMinimum(Month3)..  X(Irrigation,Month3) =G= 1 ; (LHS = 0, INFES = 1 ****)
+     
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/01/25 22:50:35 Page 3
 G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
-Column Listing      SOLVE WATERDISTRIBUTION Using LP From line 126
+Column Listing      SOLVE WATERDISTRIBUTION Using LP From line 130
 
 
 ---- X  All of volume of water per location per Month [arbitrary] except for storage which is a volume
@@ -266,9 +279,9 @@ FinalStorage
        -1       LASTANDFIRSTRESBAL
        -1       FinalReservoirCAP
 
-GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/01/25 10:56:41 Page 4
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/01/25 22:50:35 Page 4
 G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
-Range Statistics    SOLVE WATERDISTRIBUTION Using LP From line 126
+Range Statistics    SOLVE WATERDISTRIBUTION Using LP From line 130
 
 
 RANGE STATISTICS (ABSOLUTE NON-ZERO FINITE VALUES)
@@ -277,36 +290,36 @@ RHS       [min, max] : [ 1.000E+00, 9.000E+00] - Zero values observed as well
 Bound     [min, max] : [        NA,        NA] - Zero values observed as well
 Matrix    [min, max] : [ 1.000E+00, 2.200E+00]
 
-GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/01/25 10:56:41 Page 5
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/01/25 22:50:35 Page 5
 G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
-Model Statistics    SOLVE WATERDISTRIBUTION Using LP From line 126
+Model Statistics    SOLVE WATERDISTRIBUTION Using LP From line 130
 
 
 MODEL STATISTICS
 
-BLOCKS OF EQUATIONS          10     SINGLE EQUATIONS           39
+BLOCKS OF EQUATIONS          11     SINGLE EQUATIONS           42
 BLOCKS OF VARIABLES           3     SINGLE VARIABLES           32
-NON ZERO ELEMENTS           102
+NON ZERO ELEMENTS           105
 
 
 GENERATION TIME      =        0.016 SECONDS      4 MB  51.1.0 2d039df5 WEX-WEI
-GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/01/25 10:56:41 Page 6
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/01/25 22:50:35 Page 6
 G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
-Solution Report     SOLVE WATERDISTRIBUTION Using LP From line 126
+Solution Report     SOLVE WATERDISTRIBUTION Using LP From line 130
 
 
                S O L V E      S U M M A R Y
 
      MODEL   WATERDISTRIBUTION   OBJECTIVE  VPROFIT
      TYPE    LP                  DIRECTION  MAXIMIZE
-     SOLVER  CPLEX               FROM LINE  126
+     SOLVER  CPLEX               FROM LINE  130
 
 **** SOLVER STATUS     1 Normal Completion
 **** MODEL STATUS      1 Optimal
-**** OBJECTIVE VALUE               51.6000
+**** OBJECTIVE VALUE               49.3000
 
  RESOURCE USAGE, LIMIT          0.000 10000000000.000
- ITERATION COUNT, LIMIT        18    2147483647
+ ITERATION COUNT, LIMIT        19    2147483647
 *** This solver runs with a community license.
 --- GMO setup time: 0.00s
 --- GMO memory 0.51 Mb (peak 0.51 Mb)
@@ -320,7 +333,7 @@ Solution Report     SOLVE WATERDISTRIBUTION Using LP From line 126
 
 
 Optimal solution found
-Objective:           51.600000
+Objective:           49.300000
 
 
                            LOWER          LEVEL          UPPER         MARGINAL
@@ -333,20 +346,20 @@ Objective:           51.600000
 
               LOWER          LEVEL          UPPER         MARGINAL
 
-Month1        -INF            1.0000         4.0000          .          
-Month2        -INF            1.0000         4.0000          .          
+Month1        -INF            2.0000         4.0000          .          
+Month2        -INF            2.0000         4.0000          .          
 Month3        -INF            2.0000         4.0000          .          
-Month4        -INF            4.0000         4.0000         0.2000      
-Month5        -INF            4.0000         4.0000         0.5000      
-Month6        -INF            4.0000         4.0000         0.5000      
+Month4        -INF            2.0000         4.0000          .          
+Month5        -INF            4.0000         4.0000         0.3000      
+Month6        -INF            4.0000         4.0000         0.3000      
 
 ---- EQU MINIMUMFLOWATA  Minimum flow at point A
 
               LOWER          LEVEL          UPPER         MARGINAL
 
-Month1         1.0000         1.0000        +INF           -2.1000      
-Month2         1.0000         1.0000        +INF           -2.0000      
-Month3         1.0000         1.0000        +INF           -1.9000      
+Month1         1.0000         1.0000        +INF           -2.3000      
+Month2         1.0000         1.0000        +INF           -2.2000      
+Month3         1.0000         1.0000        +INF           -2.1000      
 Month4         1.0000         1.0000        +INF           -2.0000      
 Month5         1.0000         1.0000        +INF           -2.2000      
 Month6         1.0000         1.0000        +INF           -2.2000      
@@ -355,17 +368,17 @@ Month6         1.0000         1.0000        +INF           -2.2000
 
               LOWER          LEVEL          UPPER         MARGINAL
 
-Month1        -2.0000        -2.0000        -2.0000        -3.7000      
-Month2        -2.0000        -2.0000        -2.0000        -3.7000      
-Month3        -3.0000        -3.0000        -3.0000        -3.7000      
-Month4        -4.0000        -4.0000        -4.0000        -3.7000      
-Month5        -3.0000        -3.0000        -3.0000        -3.7000      
+Month1        -2.0000        -2.0000        -2.0000        -3.9000      
+Month2        -2.0000        -2.0000        -2.0000        -3.9000      
+Month3        -3.0000        -3.0000        -3.0000        -3.9000      
+Month4        -4.0000        -4.0000        -4.0000        -3.9000      
+Month5        -3.0000        -3.0000        -3.0000        -3.9000      
 
 ---- EQU FINALRESMASSBAL  Final Mass Balance at time period 6
 
               LOWER          LEVEL          UPPER         MARGINAL
 
-Month1        -2.0000        -2.0000        -2.0000        -3.7000      
+Month1        -2.0000        -2.0000        -2.0000        -3.9000      
 Month2        -2.0000        -2.0000        -2.0000          .          
 Month3        -2.0000        -2.0000        -2.0000          .          
 Month4        -2.0000        -2.0000        -2.0000          .          
@@ -377,9 +390,9 @@ Month6        -2.0000        -2.0000        -2.0000          .
               LOWER          LEVEL          UPPER         MARGINAL
 
 Month1        -INF            5.0000         9.0000          .          
-Month2        -INF            6.0000         9.0000          .          
-Month3        -INF            7.0000         9.0000          .          
-Month4        -INF            8.0000         9.0000          .          
+Month2        -INF            5.0000         9.0000          .          
+Month3        -INF            5.0000         9.0000          .          
+Month4        -INF            6.0000         9.0000          .          
 Month5        -INF            8.0000         9.0000          .          
 Month6        -INF            7.0000         9.0000          .          
 
@@ -387,22 +400,30 @@ Month6        -INF            7.0000         9.0000          .
 
               LOWER          LEVEL          UPPER         MARGINAL
 
-Month1          .              .            +INF           -2.1000      
-Month2          .              .            +INF           -2.0000      
-Month3          .              .            +INF           -1.9000      
+Month1          .              .            +INF           -2.3000      
+Month2          .              .            +INF           -2.2000      
+Month3          .              .            +INF           -2.1000      
 Month4          .              .            +INF           -2.0000      
 Month5          .              .            +INF           -2.2000      
 Month6          .              .            +INF           -2.2000      
 
                            LOWER          LEVEL          UPPER         MARGINAL
 
----- EQU LASTANDFI~        -INF           -5.0000        -5.0000         3.7000      
+---- EQU LASTANDFI~        -INF           -5.0000        -5.0000         3.9000      
 ---- EQU FinalRese~        -9.0000        -5.0000        +INF             .          
----- EQU InitialRe~         5.0000         5.0000         5.0000         3.7000      
+---- EQU InitialRe~         5.0000         5.0000         5.0000         3.9000      
 
   LASTANDFIRSTRESBAL  The final reservoir level must be greater then the initail
   FinalReservoirCAP  Limit of the final reservoir level
   InitialReservoir  The starting storage of the reservoir
+
+---- EQU IrrigationMinimum  The minimum irrigation in months 1-3
+
+              LOWER          LEVEL          UPPER         MARGINAL
+
+Month1         1.0000         1.0000        +INF           -1.3000      
+Month2         1.0000         1.0000        +INF           -1.0000      
+Month3         1.0000         1.0000        +INF           -0.2000      
 
 ---- VAR X  All of volume of water per location per Month [arbitrary] except for storage which is a volume
 
@@ -411,25 +432,25 @@ Month6          .              .            +INF           -2.2000
 Spill           .Month1          .              .            +INF           -1.6000      
 Spill           .Month2          .              .            +INF           -1.7000      
 Spill           .Month3          .              .            +INF           -1.8000      
-Spill           .Month4          .              .            +INF           -1.7000      
-Spill           .Month5          .              .            +INF           -1.5000      
-Spill           .Month6          .              .            +INF           -1.5000      
+Spill           .Month4          .              .            +INF           -1.9000      
+Spill           .Month5          .              .            +INF           -1.7000      
+Spill           .Month6          .              .            +INF           -1.7000      
 ReservoirStorage.Month1          .             5.0000        +INF             .          
-ReservoirStorage.Month2          .             6.0000        +INF             .          
-ReservoirStorage.Month3          .             7.0000        +INF             .          
-ReservoirStorage.Month4          .             8.0000        +INF             .          
+ReservoirStorage.Month2          .             5.0000        +INF             .          
+ReservoirStorage.Month3          .             5.0000        +INF             .          
+ReservoirStorage.Month4          .             6.0000        +INF             .          
 ReservoirStorage.Month5          .             8.0000        +INF             .          
 ReservoirStorage.Month6          .             7.0000        +INF             .          
-Turbine         .Month1          .             1.0000        +INF             .          
-Turbine         .Month2          .             1.0000        +INF             .          
+Turbine         .Month1          .             2.0000        +INF             .          
+Turbine         .Month2          .             2.0000        +INF             .          
 Turbine         .Month3          .             2.0000        +INF             .          
-Turbine         .Month4          .             4.0000        +INF             .          
+Turbine         .Month4          .             2.0000        +INF             .          
 Turbine         .Month5          .             4.0000        +INF             .          
 Turbine         .Month6          .             4.0000        +INF             .          
-Irrigation      .Month1          .              .            +INF           -1.1000      
-Irrigation      .Month2          .              .            +INF           -0.8000      
+Irrigation      .Month1          .             1.0000        +INF             .          
+Irrigation      .Month2          .             1.0000        +INF             .          
 Irrigation      .Month3          .             1.0000        +INF             .          
-Irrigation      .Month4          .             3.0000        +INF             .          
+Irrigation      .Month4          .             1.0000        +INF             .          
 Irrigation      .Month5          .             3.0000        +INF             .          
 Irrigation      .Month6          .             3.0000        +INF             .          
 FlowA           .Month1          .             1.0000        +INF             .          
@@ -441,7 +462,7 @@ FlowA           .Month6          .             1.0000        +INF             .
 
                            LOWER          LEVEL          UPPER         MARGINAL
 
----- VAR VPROFIT           -INF           51.6000        +INF             .          
+---- VAR VPROFIT           -INF           49.3000        +INF             .          
 ---- VAR FinalStor~          .             5.0000        +INF             .          
 
   VPROFIT  Objective Function Value ($)

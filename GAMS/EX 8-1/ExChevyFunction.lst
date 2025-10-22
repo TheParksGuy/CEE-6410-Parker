@@ -1,0 +1,227 @@
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/21/25 16:03:24 Page 1
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+C o m p i l a t i o n
+
+
+      CEE 6410 Fall 2020
+      Trying to find the global optimum with lots of local optimals
+      Example - the ChevyChev Function - https://www.chebfun.org/docs/guide/guide12.html
+       
+      Solve the non-linear programming programming problem
+       
+      Max Z =  3*(1-x).^2.*exp(-(x.^2) - (y+1).^2) ...
+         - 10*(x/5 - x.^3 - y.^5).*exp(-x.^2-y.^2) ...
+         - 1/3*exp(-(x+1).^2 - y.^2)
+      s.t.
+              -3 <= x <= 3
+              -3 <= y <= 3
+       
+      Where x and y are the two decision variables and limited to the range -3 and 3
+       
+      Students will explore solving the problem with different starting points
+       
+      David E Rosenberg
+      david.rosenberg@usu.edu
+      October 4, 2020
+  23   
+  24  * 1. DEFINE the SETS
+  25  SETS i decision variables /x,y/;
+  26   
+  27   
+  28  * 2. DEFINE the variables
+  29  VARIABLES
+  30          X(i) decision variable values
+  31          Z objective function value (chevychev function);
+  32   
+  33  * 3. Parameter to hold initial conditions.
+  34  PARAMETER
+  35          XStart(i) Initial starting point - save
+  36   
+  37  * 4. COMBINE variables and data in equations
+  38  EQUATIONS
+  39          ObjFun          Objective function;
+  40   
+  41  *                                power(x,2) is the same as x**2 (x^2) but works for negative values of x
+  42  ObjFun..          Z =E= 3*(1-power(X("x"),2))*exp(-power(X("x"),2) - power(X("y")+1, 2))
+  43                          - 10*(X("x")/5 - power(X("x"),3) - power(X("y"),5))*exp(-power(X("x"),2)-power(X("y"),2))
+  44                          - 1/3*exp(-power(X("x")+1, 2) - power(X("y"),2));
+  45   
+  46  * 5. DEFINE the MODEL from the EQUATIONS
+  47  MODEL ChevyModel /ALL/;
+  48   
+  49  *Directions to the solver to set lower and upper bounds (without equations)
+  50  *for all decision variables to -3 and 3
+  51  X.LO(i) = -3;
+  52  X.UP(i) = 3;
+  53   
+  54  *Direction to the solver to specify the initial variable value levels (initial start point)
+  55  X.L("x") = .5;
+  56  X.L("y") = -.8;
+  57   
+  58  *Save the starting point so we can see it at the end with the solution
+  59  XStart(i) = X.L(i)
+  60   
+  61  * 6. Solve the Model as an LP (relaxed IP)
+  62  SOLVE ChevyModel USING NLP Maximizing Z;
+  63   
+  64  DISPLAY X.L, Z.L, XStart;
+
+
+COMPILATION TIME     =        0.000 SECONDS      3 MB  51.1.0 2d039df5 WEX-WEI
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/21/25 16:03:24 Page 2
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Equation Listing    SOLVE ChevyModel Using NLP From line 62
+
+
+---- ObjFun  =E=  Objective function
+
+ObjFun..  (0.371228044607285)*X(x) - (5.71839542693193)*X(y) + Z =E= 0 ; (LHS = -0.422094790417144, INFES = 0.422094790417144 ****)
+     
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/21/25 16:03:24 Page 3
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Column Listing      SOLVE ChevyModel Using NLP From line 62
+
+
+---- X  decision variable values
+
+X(x)
+                (.LO, .L, .UP, .M = -3, 0.5, 3, 0)
+       (0.3712) ObjFun
+
+X(y)
+                (.LO, .L, .UP, .M = -3, -0.8, 3, 0)
+      (-5.7184) ObjFun
+
+
+---- Z  objective function value (chevychev function)
+
+Z
+                (.LO, .L, .UP, .M = -INF, 0, +INF, 0)
+        1       ObjFun
+
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/21/25 16:03:24 Page 4
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Range Statistics    SOLVE ChevyModel Using NLP From line 62
+
+
+RANGE STATISTICS (ABSOLUTE NON-ZERO FINITE VALUES)
+
+RHS       [min, max] : [        NA,        NA] - Zero values observed as well
+Bound     [min, max] : [ 3.000E+00, 3.000E+00]
+Matrix    [min, max] : [ 3.712E-01, 5.718E+00]
+
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/21/25 16:03:24 Page 5
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Model Statistics    SOLVE ChevyModel Using NLP From line 62
+
+
+MODEL STATISTICS
+
+BLOCKS OF EQUATIONS           1     SINGLE EQUATIONS            1
+BLOCKS OF VARIABLES           2     SINGLE VARIABLES            3
+NON ZERO ELEMENTS             3     NON LINEAR N-Z              2
+CODE LENGTH                  48     CONSTANT POOL              18
+
+
+GENERATION TIME      =        0.031 SECONDS      4 MB  51.1.0 2d039df5 WEX-WEI
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/21/25 16:03:24 Page 6
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Solution Report     SOLVE ChevyModel Using NLP From line 62
+
+
+               S O L V E      S U M M A R Y
+
+     MODEL   ChevyModel          OBJECTIVE  Z
+     TYPE    NLP                 DIRECTION  MAXIMIZE
+     SOLVER  CONOPT              FROM LINE  62
+
+**** SOLVER STATUS     1 Normal Completion
+**** MODEL STATUS      2 Locally Optimal
+**** OBJECTIVE VALUE                3.4446
+
+ RESOURCE USAGE, LIMIT          0.015 10000000000.000
+ ITERATION COUNT, LIMIT         7    2147483647
+ EVALUATION ERRORS              0             0
+ 
+ 
+    C O N O P T   version 4.38.1
+    Copyright (C) GAMS Software GmbH
+                  GAMS Development Corporation
+ 
+    Will use up to 4 threads.
+ 
+ 
+    The user model has 1 constraints and 3 variables
+    with 3 Jacobian elements, 2 of which are nonlinear.
+    The Hessian of the Lagrangian has 2 elements on the diagonal,
+    1 elements below the diagonal, and 2 nonlinear variables.
+ 
+    The post-triangular part of the model has 1 constraints and variables.
+ 
+    Preprocessed model has no constraints and 2 variables.
+ 
+ ** Optimal solution. Reduced gradient less than tolerance.
+ 
+ 
+ CONOPT time Total                            0.000 seconds
+   of which: Function evaluations             0.000 =  0.0%
+             1st Derivative evaluations       0.000 =  0.0%
+             2nd Derivative evaluations       0.000 =  0.0%
+             Directional 2nd Deriv(Hess)      0.000 =  0.0%
+             Interval derivative evals        0.000 =  0.0%
+ 
+
+                           LOWER          LEVEL          UPPER         MARGINAL
+
+---- EQU ObjFun              .              .              .             1.0000      
+
+  ObjFun  Objective function
+
+---- VAR X  decision variable values
+
+         LOWER          LEVEL          UPPER         MARGINAL
+
+x        -3.0000         1.2678         3.0000         EPS         
+y        -3.0000         0.0362         3.0000         EPS         
+
+                           LOWER          LEVEL          UPPER         MARGINAL
+
+---- VAR Z                 -INF            3.4446        +INF             .          
+
+  Z  objective function value (chevychev function)
+
+
+**** REPORT SUMMARY :        0     NONOPT
+                             0 INFEASIBLE
+                             0  UNBOUNDED
+                             0     ERRORS
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/21/25 16:03:24 Page 7
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+E x e c u t i o n
+
+
+----     64 VARIABLE X.L  decision variable values
+
+x 1.268,    y 0.036
+
+
+----     64 VARIABLE Z.L                   =        3.445  objective function value (chevychev function)
+
+----     64 PARAMETER XStart  Initial starting point - save
+
+x  0.500,    y -0.800
+
+
+
+EXECUTION TIME       =        0.094 SECONDS      4 MB  51.1.0 2d039df5 WEX-WEI
+
+
+USER: Course License                                 G250902+0003Ac-GEN
+      Utah State University                                     DCE4709
+      License for teaching and research at degree granting institutions
+
+
+**** FILE SUMMARY
+
+Input      C:\Users\bhpar\OneDrive\Documents\School\Fall 2025\System Analysis\CEE-6410-Parker\GAMS\EX 8-1\ExChevyFunction.gms
+Output     C:\Users\bhpar\OneDrive\Documents\School\Fall 2025\System Analysis\CEE-6410-Parker\GAMS\EX 8-1\ExChevyFunction.lst

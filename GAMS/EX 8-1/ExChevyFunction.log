@@ -1,0 +1,79 @@
+
+--- Job ExChevyFunction.gms Start 10/21/25 16:03:24 51.1.0 2d039df5 WEX-WEI x86 64bit/MS Windows
+--- Applying:
+    C:\GAMS\51\gmsprmNT.txt
+--- GAMS Parameters defined
+    Input "C:\Users\bhpar\OneDrive\Documents\School\Fall 2025\System Analysis\CEE-6410-Parker\GAMS\EX 8-1\ExChevyFunction.gms"
+    PageSize 0
+    ScrDir "C:\Users\bhpar\OneDrive\Documents\School\Fall 2025\System Analysis\CEE-6410-Parker\GAMS\EX 8-1\225a\"
+    SysDir C:\GAMS\51\
+    LogOption 3
+    AppendLog 1
+    ErrMsg 1
+    ErrorLog 99
+    IDE 1
+    LstTitleLeftAligned 1
+Licensee: Course License                                 G250902+0003Ac-GEN
+          Utah State University                                     DCE4709
+          225a\gamslice.dat
+          node:23533203 mem:32 cores:8 ipport:64714 uses:0@0 v:2           
+          Course license for use within the course and related course work
+          The expiration date of time-limited license is Dec 31, 2025
+System information: 8 physical cores and 32 Gb physical memory detected
+GAMS 51.1.0   Copyright (C) 1987-2025 GAMS Development. All rights reserved
+--- Starting compilation
+--- ExChevyFunction.gms(64) 3 Mb
+--- Starting execution: elapsed 0:00:00.021
+--- ExChevyFunction.gms(59) 4 Mb
+--- Generating NLP model ChevyModel
+--- ExChevyFunction.gms(62) 6 Mb
+---   1 rows  3 columns  3 non-zeroes
+---   48 nl-code  2 nl-non-zeroes
+--- Range statistics (absolute non-zero finite values)
+--- RHS       [min, max] : [        NA,        NA] - Zero values observed as well
+--- Bound     [min, max] : [ 3.000E+00, 3.000E+00]
+--- Matrix    [min, max] : [ 3.712E-01, 5.718E+00]
+--- ExChevyFunction.gms(62) 4 Mb
+--- Executing CONOPT (Solvelink=2): elapsed 0:00:00.062
+
+CONOPT 4         51.1.0 2d039df5 Sep 13, 2025          WEI x86 64bit/MS Window
+
+ 
+ 
+    C O N O P T   version 4.38.1
+    Copyright (C) GAMS Software GmbH
+                  GAMS Development Corporation
+ 
+    Will use up to 4 threads.
+ 
+ 
+    The user model has 1 constraints and 3 variables
+    with 3 Jacobian elements, 2 of which are nonlinear.
+    The Hessian of the Lagrangian has 2 elements on the diagonal,
+    1 elements below the diagonal, and 2 nonlinear variables.
+ 
+    Iter Phase   Ninf   Infeasibility   RGmax      NSB   Step  InItr MX OK
+       0   0          4.2209479042E-01 (Input point)
+ 
+    The post-triangular part of the model has 1 constraints and variables.
+ 
+    Preprocessed model has no constraints and 2 variables.
+ 
+    Iter Phase   Ninf   Infeasibility   RGmax      NSB   Step  InItr MX OK
+                      0.0000000000E+00 (Full preprocessed model)
+                      0.0000000000E+00 (After scaling)
+ 
+ ** Feasible solution. Value of objective =   0.422094790417
+ 
+    Iter Phase   Ninf     Objective     RGmax      NSB   Step  InItr MX OK
+       1   4          1.2980324095E+00 5.7E+00       2 1.0E+00     2 F  T
+       6   4          3.4445517969E+00 1.5E-04       2 1.0E+00     2 F  T
+       7   4          3.4445517969E+00 2.4E-10       2
+ 
+ ** Optimal solution. Reduced gradient less than tolerance.
+ 
+--- Reading solution for model ChevyModel
+--- Executing after solve: elapsed 0:00:00.117
+--- ExChevyFunction.gms(64) 4 Mb
+*** Status: Normal completion
+--- Job ExChevyFunction.gms Stop 10/21/25 16:03:24 elapsed 0:00:00.117

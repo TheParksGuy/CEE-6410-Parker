@@ -1,0 +1,378 @@
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/21/25 09:57:45 Page 1
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+C o m p i l a t i o n
+
+
+   1   
+        
+       THE PROBLEM:
+       A farmer is planning production for the coming year. They produces
+       Hays and Grain. The farmer will produce 10,000 Acres of crops for the year.
+       Each month recieves a total amount of water and each crop has a different water requirement per month
+       
+                        June    July    August
+              Hay       2       1       1
+            Grain       1       2       0
+      Total Water       14000   18000   6000
+       
+       
+       Hays generates $100/crop acre while Grain generate $110/crop acre.
+        
+  18   
+  19   
+  20  * 1. DEFINE the SETS
+  21   SETS plant Acres produced /Hay, Grain/
+  22        res resources /June, July, August,Acres/;
+  23   
+  24  * 2. DEFINE input data
+  25   PARAMETERS
+  26      c(plant) Objective function coefficients ($ per vehicle)
+  27            /Hay  100,
+  28            Grain   120/
+  29      b(res) Right hand constraint values (per resource)
+  30             /June            14000,
+  31              July            18000,
+  32              August          6000,
+  33              Acres           10000/
+  34  ;
+  35   
+  36   TABLE A(plant,res) Left hand side constraint coefficients
+  37                  June   July   August   Acres
+  38    Hay           2       1       1        1
+  39    Grain         1       2       0        1;
+  40   
+  41   
+  42  * 3. DEFINE the variables
+  43   VARIABLES X(plant) Acres made (Number)
+  44             VPROFIT  total profit ($)
+  45             Y(res)   dual
+  46             DualCOST;
+  47   
+  48  * Non-negativity constraints
+  49   POSITIVE VARIABLES X,Y;
+  50   
+  51  * 4. COMBINE variables and data in equations
+  52   EQUATIONS
+  53      PROFIT                  Total profit ($) and objective function value
+  54      RES_CONSTRAIN(res)      Resource Constraints
+  55      DualExpense             Total usage of each resource
+  56      Plnt_Constrain(plant)   plant
+  57  ;
+  58   
+  59   PROFIT..                 VPROFIT =E= SUM(plant, c(plant)*X(plant));
+  60   RES_CONSTRAIN(res) ..    SUM(plant, A(plant,res)*X(plant)) =L= b(res);
+  61   DualExpense ..              DualCOST =E= SUM(res,b(res)*Y(res));
+  62   Plnt_Constrain(plant)..  SUM(res,A(plant,res)*Y(res)) =G= c(plant);
+  63   
+  64   
+  65  * 5. DEFINE the MODEL from the EQUATIONS
+  66  MODEL PLANTING /PROFIT, RES_CONSTRAIN/;
+  67  MODEL DualPLANTING /DualExpense, Plnt_Constrain/;
+  68  *Altnerative way to write (include all previously defined equations)
+  69  *MODEL PLANTING /ALL/;
+  70   
+  71   
+  72  * 6. SOLVE the MODEL
+  73  * Solve the PLANTING model using a Linear Programming Solver (see File=>Options=>Solvers)
+  74  *     to maximize VPROFIT
+  75   SOLVE PLANTING USING LP MAXIMIZING VPROFIT;
+  76   SOLVE DualPLANTING USING LP MINIMIZING DualCOST;
+  77   
+  78  DISPLAY VPROFIT.L, DUALCOST.L;
+
+
+COMPILATION TIME     =        0.000 SECONDS      3 MB  51.1.0 2d039df5 WEX-WEI
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/21/25 09:57:45 Page 2
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Equation Listing    SOLVE PLANTING Using LP From line 75
+
+
+---- PROFIT  =E=  Total profit ($) and objective function value
+
+PROFIT..  - 100*X(Hay) - 120*X(Grain) + VPROFIT =E= 0 ; (LHS = 0)
+     
+
+---- RES_CONSTRAIN  =L=  Resource Constraints
+
+RES_CONSTRAIN(June)..  2*X(Hay) + X(Grain) =L= 14000 ; (LHS = 0)
+     
+RES_CONSTRAIN(July)..  X(Hay) + 2*X(Grain) =L= 18000 ; (LHS = 0)
+     
+RES_CONSTRAIN(August)..  X(Hay) =L= 6000 ; (LHS = 0)
+     
+REMAINING ENTRY SKIPPED
+
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/21/25 09:57:45 Page 3
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Column Listing      SOLVE PLANTING Using LP From line 75
+
+
+---- X  Acres made (Number)
+
+X(Hay)
+                (.LO, .L, .UP, .M = 0, 0, +INF, 0)
+     -100       PROFIT
+        2       RES_CONSTRAIN(June)
+        1       RES_CONSTRAIN(July)
+        1       RES_CONSTRAIN(August)
+        1       RES_CONSTRAIN(Acres)
+
+X(Grain)
+                (.LO, .L, .UP, .M = 0, 0, +INF, 0)
+     -120       PROFIT
+        1       RES_CONSTRAIN(June)
+        2       RES_CONSTRAIN(July)
+        1       RES_CONSTRAIN(Acres)
+
+
+---- VPROFIT  total profit ($)
+
+VPROFIT
+                (.LO, .L, .UP, .M = -INF, 0, +INF, 0)
+        1       PROFIT
+
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/21/25 09:57:45 Page 4
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Range Statistics    SOLVE PLANTING Using LP From line 75
+
+
+RANGE STATISTICS (ABSOLUTE NON-ZERO FINITE VALUES)
+
+RHS       [min, max] : [ 6.000E+03, 1.800E+04] - Zero values observed as well
+Bound     [min, max] : [        NA,        NA] - Zero values observed as well
+Matrix    [min, max] : [ 1.000E+00, 1.200E+02]
+
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/21/25 09:57:45 Page 5
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Model Statistics    SOLVE PLANTING Using LP From line 75
+
+
+MODEL STATISTICS
+
+BLOCKS OF EQUATIONS           2     SINGLE EQUATIONS            5
+BLOCKS OF VARIABLES           2     SINGLE VARIABLES            3
+NON ZERO ELEMENTS            10
+
+
+GENERATION TIME      =        0.078 SECONDS      4 MB  51.1.0 2d039df5 WEX-WEI
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/21/25 09:57:45 Page 6
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Solution Report     SOLVE PLANTING Using LP From line 75
+
+
+               S O L V E      S U M M A R Y
+
+     MODEL   PLANTING            OBJECTIVE  VPROFIT
+     TYPE    LP                  DIRECTION  MAXIMIZE
+     SOLVER  CPLEX               FROM LINE  75
+
+**** SOLVER STATUS     1 Normal Completion
+**** MODEL STATUS      1 Optimal
+**** OBJECTIVE VALUE          1160000.0000
+
+ RESOURCE USAGE, LIMIT          0.000 10000000000.000
+ ITERATION COUNT, LIMIT         3    2147483647
+*** This solver runs with a community license.
+--- GMO setup time: 0.00s
+--- GMO memory 0.50 Mb (peak 0.50 Mb)
+--- Dictionary memory 0.00 Mb
+--- Cplex 22.1.2.0 link memory 0.00 Mb (peak 0.00 Mb)
+--- Starting Cplex
+
+
+--- LP status (1): optimal.
+--- Cplex Time: 0.00sec (det. 0.01 ticks)
+
+
+Optimal solution found
+Objective:      1160000.000000
+
+
+                           LOWER          LEVEL          UPPER         MARGINAL
+
+---- EQU PROFIT              .              .              .             1.0000      
+
+  PROFIT  Total profit ($) and objective function value
+
+---- EQU RES_CONSTRAIN  Resource Constraints
+
+              LOWER          LEVEL          UPPER         MARGINAL
+
+June          -INF        12000.0000     14000.0000          .          
+July          -INF        18000.0000     18000.0000        20.0000      
+August        -INF         2000.0000      6000.0000          .          
+Acres         -INF        10000.0000     10000.0000        80.0000      
+
+---- VAR X  Acres made (Number)
+
+             LOWER          LEVEL          UPPER         MARGINAL
+
+Hay            .          2000.0000        +INF             .          
+Grain          .          8000.0000        +INF             .          
+
+                           LOWER          LEVEL          UPPER         MARGINAL
+
+---- VAR VPROFIT           -INF      1160000.0000        +INF             .          
+
+  VPROFIT  total profit ($)
+
+
+**** REPORT SUMMARY :        0     NONOPT
+                             0 INFEASIBLE
+                             0  UNBOUNDED
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/21/25 09:57:45 Page 7
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Equation Listing    SOLVE DualPLANTING Using LP From line 76
+
+
+---- DualExpense  =E=  Total usage of each resource
+
+DualExpense..  - 14000*Y(June) - 18000*Y(July) - 6000*Y(August) - 10000*Y(Acres) + DualCOST =E= 0 ; (LHS = 0)
+     
+
+---- Plnt_Constrain  =G=  plant
+
+Plnt_Constrain(Hay)..  2*Y(June) + Y(July) + Y(August) + Y(Acres) =G= 100 ; (LHS = 0, INFES = 100 ****)
+     
+Plnt_Constrain(Grain)..  Y(June) + 2*Y(July) + Y(Acres) =G= 120 ; (LHS = 0, INFES = 120 ****)
+     
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/21/25 09:57:45 Page 8
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Column Listing      SOLVE DualPLANTING Using LP From line 76
+
+
+---- Y  dual
+
+Y(June)
+                (.LO, .L, .UP, .M = 0, 0, +INF, 0)
+   -14000       DualExpense
+        2       Plnt_Constrain(Hay)
+        1       Plnt_Constrain(Grain)
+
+Y(July)
+                (.LO, .L, .UP, .M = 0, 0, +INF, 0)
+   -18000       DualExpense
+        1       Plnt_Constrain(Hay)
+        2       Plnt_Constrain(Grain)
+
+Y(August)
+                (.LO, .L, .UP, .M = 0, 0, +INF, 0)
+    -6000       DualExpense
+        1       Plnt_Constrain(Hay)
+
+REMAINING ENTRY SKIPPED
+
+---- DualCOST  
+
+DualCOST
+                (.LO, .L, .UP, .M = -INF, 0, +INF, 0)
+        1       DualExpense
+
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/21/25 09:57:45 Page 9
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Range Statistics    SOLVE DualPLANTING Using LP From line 76
+
+
+RANGE STATISTICS (ABSOLUTE NON-ZERO FINITE VALUES)
+
+RHS       [min, max] : [ 1.000E+02, 1.200E+02] - Zero values observed as well
+Bound     [min, max] : [        NA,        NA] - Zero values observed as well
+Matrix    [min, max] : [ 1.000E+00, 1.800E+04]
+
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/21/25 09:57:45 Page 10
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Model Statistics    SOLVE DualPLANTING Using LP From line 76
+
+
+MODEL STATISTICS
+
+BLOCKS OF EQUATIONS           2     SINGLE EQUATIONS            3
+BLOCKS OF VARIABLES           2     SINGLE VARIABLES            5
+NON ZERO ELEMENTS            12
+
+
+GENERATION TIME      =        0.000 SECONDS      4 MB  51.1.0 2d039df5 WEX-WEI
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/21/25 09:57:45 Page 11
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Solution Report     SOLVE DualPLANTING Using LP From line 76
+
+
+               S O L V E      S U M M A R Y
+
+     MODEL   DualPLANTING        OBJECTIVE  DualCOST
+     TYPE    LP                  DIRECTION  MINIMIZE
+     SOLVER  CPLEX               FROM LINE  76
+
+**** SOLVER STATUS     1 Normal Completion
+**** MODEL STATUS      1 Optimal
+**** OBJECTIVE VALUE          1160000.0000
+
+ RESOURCE USAGE, LIMIT          0.000 10000000000.000
+ ITERATION COUNT, LIMIT         2    2147483647
+*** This solver runs with a community license.
+--- GMO setup time: 0.00s
+--- GMO memory 0.50 Mb (peak 0.50 Mb)
+--- Dictionary memory 0.00 Mb
+--- Cplex 22.1.2.0 link memory 0.00 Mb (peak 0.00 Mb)
+--- Starting Cplex
+
+
+--- LP status (1): optimal.
+--- Cplex Time: 0.00sec (det. 0.00 ticks)
+
+
+Optimal solution found
+Objective:      1160000.000000
+
+
+                           LOWER          LEVEL          UPPER         MARGINAL
+
+---- EQU DualExpen~          .              .              .             1.0000      
+
+  DualExpense  Total usage of each resource
+
+---- EQU Plnt_Constrain  plant
+
+             LOWER          LEVEL          UPPER         MARGINAL
+
+Hay         100.0000       100.0000        +INF         2000.0000      
+Grain       120.0000       120.0000        +INF         8000.0000      
+
+---- VAR Y  dual
+
+              LOWER          LEVEL          UPPER         MARGINAL
+
+June            .              .            +INF         2000.0000      
+July            .            20.0000        +INF             .          
+August          .              .            +INF         4000.0000      
+Acres           .            80.0000        +INF             .          
+
+                           LOWER          LEVEL          UPPER         MARGINAL
+
+---- VAR DualCOST          -INF      1160000.0000        +INF             .          
+
+
+**** REPORT SUMMARY :        0     NONOPT
+                             0 INFEASIBLE
+                             0  UNBOUNDED
+GAMS 51.1.0  2d039df5 Sep 13, 2025          WEX-WEI x86 64bit/MS Windows - 10/21/25 09:57:45 Page 12
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+E x e c u t i o n
+
+
+----     78 VARIABLE VPROFIT.L             =  1160000.000  total profit ($)
+            VARIABLE DualCOST.L            =  1160000.000  
+
+
+EXECUTION TIME       =        0.344 SECONDS      4 MB  51.1.0 2d039df5 WEX-WEI
+
+
+USER: Course License                                 G250902+0003Ac-GEN
+      Utah State University                                     DCE4709
+      License for teaching and research at degree granting institutions
+
+
+**** FILE SUMMARY
+
+Input      C:\Users\bhpar\OneDrive\Documents\School\Fall 2025\System Analysis\CEE-6410-Parker\GAMS\HW#6\HW6 (2-3).gms
+Output     C:\Users\bhpar\OneDrive\Documents\School\Fall 2025\System Analysis\CEE-6410-Parker\GAMS\HW#6\HW6 (2-3).lst

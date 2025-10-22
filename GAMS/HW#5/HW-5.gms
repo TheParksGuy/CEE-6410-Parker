@@ -92,6 +92,8 @@ SCALAR  TurbineCapacity Maximum Flow Through Turbine in a Month /4/
     LASTANDFIRSTRESBAL The final reservoir level must be greater then the initail
     FinalReservoirCAP Limit of the final reservoir level
     InitialReservoir The starting storage of the reservoir
+    IrrigationMinimum The minimum irrigation in months 1-3
+    
     ;
  
 
@@ -114,6 +116,8 @@ LASTANDFIRSTRESBAL ..                   ResInitialStor =L= FinalStorage;
 FinalReservoirCAP ..                    MaximumReservoirStorage =G= FinalStorage;
 
 InitialReservoir ..                     X("ReservoirStorage","Month1") =E= ResInitialStor;
+
+IrrigationMinimum(month)$(ord(month) lt 4) .. X("irrigation",month) =G= 1;
 
 
 * 5. DEFINE the MODEL from the EQUATIONS

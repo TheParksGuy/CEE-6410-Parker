@@ -1,0 +1,60 @@
+B 3 C o m p i l a t i o n
+B 138 E x e c u t i o n
+I 138 TomWatReq
+B 147 Equation Listing    SOLVE PLANTING Using LP From line 110
+D 150 PROFIT
+D 155 RES_CONSTRAIN
+B 165 Column Listing      SOLVE PLANTING Using LP From line 110
+E 168 X
+E 185 VPROFIT
+B 193 Range Statistics    SOLVE PLANTING Using LP From line 110
+B 204 Model Statistics    SOLVE PLANTING Using LP From line 110
+B 222 Solution Report     SOLVE PLANTING Using LP From line 110
+F 255 PROFIT
+F 259 RES_CONSTRAIN
+G 267 X
+G 276 VPROFIT
+B 286 Equation Listing    SOLVE PLANTING Using LP From line 110
+D 289 PROFIT
+D 294 RES_CONSTRAIN
+B 304 Column Listing      SOLVE PLANTING Using LP From line 110
+E 307 X
+E 324 VPROFIT
+B 332 Range Statistics    SOLVE PLANTING Using LP From line 110
+B 343 Model Statistics    SOLVE PLANTING Using LP From line 110
+B 361 Solution Report     SOLVE PLANTING Using LP From line 110
+F 394 PROFIT
+F 398 RES_CONSTRAIN
+G 406 X
+G 415 VPROFIT
+B 425 Equation Listing    SOLVE PLANTING Using LP From line 110
+D 428 PROFIT
+D 433 RES_CONSTRAIN
+B 443 Column Listing      SOLVE PLANTING Using LP From line 110
+E 446 X
+E 463 VPROFIT
+B 471 Range Statistics    SOLVE PLANTING Using LP From line 110
+B 482 Model Statistics    SOLVE PLANTING Using LP From line 110
+B 500 Solution Report     SOLVE PLANTING Using LP From line 110
+F 533 PROFIT
+F 537 RES_CONSTRAIN
+G 545 X
+G 554 VPROFIT
+B 564 Equation Listing    SOLVE PLANTING Using LP From line 110
+D 567 PROFIT
+D 572 RES_CONSTRAIN
+B 582 Column Listing      SOLVE PLANTING Using LP From line 110
+E 585 X
+E 602 VPROFIT
+B 610 Range Statistics    SOLVE PLANTING Using LP From line 110
+B 621 Model Statistics    SOLVE PLANTING Using LP From line 110
+B 639 Solution Report     SOLVE PLANTING Using LP From line 110
+F 672 PROFIT
+F 676 RES_CONSTRAIN
+G 684 X
+G 693 VPROFIT
+B 703 E x e c u t i o n
+I 703 TomWatReq
+I 709 ObjFunc
+I 714 DecVars
+I 724 ShadowVals
